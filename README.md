@@ -19,7 +19,7 @@ I've included the .idea directory to help with CLion setup with a custom compile
 
 ### Direct Build
 
-    cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=toolchain/cc65-toolchain.cmake -S . -B ./bin
+    cmake -G Ninja --toolchain toolchain/cc65-toolchain.cmake -S . -B ./bin
     cmake --build ./bin --target nesrpg -j 9
 
 ### Output
