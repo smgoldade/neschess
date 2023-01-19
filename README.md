@@ -4,7 +4,7 @@ At least that's the goal.
 I'm doing this as a personal project on behalf of my job.
 
 ## Recognition
-This project derives pretty much all necessary information needed for programming
+This project derives pretty much all necessary information needed for programming the NES from
 the NES Wiki over at from [nesdev](https://www.nesdev.org/).  
 Additional inspiration and ideas taken from [nesdoug](https://nesdoug.com).
 
