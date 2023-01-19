@@ -3,6 +3,11 @@ An RPG. Made for the NES!
 At least that's the goal.  
 I'm doing this as a personal project on behalf of my job.
 
+## Recognition
+This project derives pretty much all necessary information needed for programming
+the NES Wiki over at from [nesdev](https://www.nesdev.org/).  
+Additional inspiration and ideas taken from [nesdoug](https://nesdoug.com).
+
 ## Build
 Compiled with [cc65](https://cc65.github.io/).  
 Build is via [CMake](https://cmake.org/), I recommend the [Ninja](https://ninja-build.org/) build generator.  

@@ -1,4 +1,5 @@
 # A toolchain file to use cc65 to crosscompile for the 6502
+# Based on the one available at https://github.com/jviskari/cc65_cmake
 
 set(CMAKE_SYSTEM_NAME Generic)
 
