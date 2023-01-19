@@ -4,7 +4,7 @@ At least that's the goal.
 
 ## Recognition
 This project derives pretty much all necessary information needed for programming the NES from
-the NES Wiki over at from [nesdev](https://www.nesdev.org/).  
+the NES Wiki over at [nesdev](https://www.nesdev.org/).  
 Additional inspiration and ideas taken from [nesdoug](https://nesdoug.com).
 
 ## Build
