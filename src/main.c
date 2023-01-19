@@ -3,10 +3,6 @@
  */
 #include "nes/nes.h"
 
-extern void nmi() {
-
-}
-
 u8 palette[] = {
     BLACK, WHITE, DARK_GRAY, MEDIUM_GRAY
 };
