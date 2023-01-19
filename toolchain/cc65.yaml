@@ -1,0 +1,70 @@
+compilers:
+  - description: "CL65"
+    match-sources: ".*\\.c"
+    match-language: C
+    match-compiler-exe: "(.*/)?cl65(\\.exe)?"
+    include-dirs: /opt/local/share/cc65/include/
+    defines-text: "
+    #define __asm__
+    #define asm
+    #define __A__
+    #define __AX__
+    #define __EAX__
+    #define __APPLE2__
+    #define __APPLE2ENH__
+    #define __ATARI2600__
+    #define __ATARI5200__
+    #define __ATARI__
+    #define __ATARIXL__
+    #define __ATMOS__
+    #define __C128__
+    #define __C16__
+    #define __C64__
+    #define __CBM__
+    #define __CBM510__
+    #define __CC65__
+    #define __CC65_STD__
+    #define cdecl
+    #define __cdecl__
+    #define __CX16__
+    #define __DATE__
+    #define __EAGERLY_INLINE_FUNCS__
+    #define __fastcall__
+    #define __FILE__
+    #define __func__
+    #define __GEOS__
+    #define __GEOS_APPLE__
+    #define __GEOS_CBM__
+    #define __LINE__
+    #define __LUNIX__
+    #define __LYNX__
+    #define __NES__
+    #define __OPT__
+    #define __OPT_i__
+    #define __OPT_r__
+    #define __OPT_s__
+    #define __OSIC1P__
+    #define __PET__
+    #define __PLUS4__
+    #define __STDC_HOSTED__
+    #define __SIM6502__
+    #define __SIM65C02__
+    #define __SUPERVISION__
+    #define __TELESTRAT__
+    #define __TIME__
+    #define __VIC20__
+    #define __little_endian__ 1	
+    #define __LITTLE_ENDIAN__ 1
+    #define __CHAR_BIT__ 8	
+    #define __SCHAR_MAX__ 127	
+    #define __SHRT_MAX__ 32767	
+    #define __INT_MAX__ 32767	
+    #define __SIZEOF_INT__ 2
+    #define __SIZEOF_SHORT__ 2
+    #define __SIZEOF_LONG__ 4
+    "
+
+  - description: "CL65"
+    match-sources: ".*\\.s"
+    match-compiler-exe: "(.*/)?cl65(\\.exe)?"
+    include-dirs: /opt/local/share/cc65/include/
