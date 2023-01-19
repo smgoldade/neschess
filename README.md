@@ -1,7 +1,6 @@
 # nesrpg
 An RPG. Made for the NES!  
-At least that's the goal.  
-I'm doing this as a personal project on behalf of my job.
+At least that's the goal.
 
 ## Recognition
 This project derives pretty much all necessary information needed for programming the NES from
