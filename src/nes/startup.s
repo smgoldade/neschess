@@ -1,19 +1,18 @@
 ; Author: Steven Goldade
+.include "nes_apu.inc"
+.include "nes_interrupt.inc"
+.include "nes_ppu.inc"
+.include "nes_zeropage.inc"
+
 .import _main, copydata
 .export __STARTUP__ : absolute = 1
 .export reset
 
-.importzp ZP_PPU_CTRL
-.import PPU_CTRL, PPU_MASK, PPU_STATUS, PPU_DATA, PPU_ADDR
-.import APU_DMC_FLAGS, APU_FRAME_COUNTER
-
 .segment "VECTORS"
-.import nmi, irq
 .word nmi
 .word reset
 .word irq
 
-.include "zeropage.inc" ; for compiler zero page info
 .import __STACK_START__,__STACK_SIZE__
 .segment "STARTUP"
 ; This reset takes most of its ideas from NESdev's init
@@ -30,10 +29,8 @@ reset:
     stx APU_DMC_FLAGS
 
 ppu_init:
-    bit PPU_STATUS ; clear vblank flag
-@1:
-    bit PPU_STATUS
-    bpl @1 ; wait until a vblank (V goes to Plus)
+    bit PPU_STATUS ; clear vblank flag if it was set on reset
+    jsr ppu_wait
 
 clear_palette:
     lda #$3f
@@ -80,11 +77,7 @@ clear_nametables:
     sta sp
     stx sp+1
 
-ppu_wait:
-    bit PPU_STATUS ; clear vblank flag
-@1:
-    bit PPU_STATUS
-    bpl @1
+    jsr ppu_wait
 
     ; enable PPU NMI
     lda #$80

@@ -8,38 +8,45 @@ typedef signed int s16;
 typedef unsigned long u32;
 typedef signed long s32;
 
-void __fastcall__ ppu_set_addr(u16 addr);
-void __fastcall__ ppu_write(u8* data, u16 size);
-void __fastcall__ ppu_off(void);
-void __fastcall__ ppu_on(void);
+extern void __fastcall__ ppu_set_addr(u16 addr);
+extern void __fastcall__ ppu_write(const u8* data, u16 size);
+extern void __fastcall__ ppu_off(void);
+extern void __fastcall__ ppu_on(void);
+extern void __fastcall__ ppu_wait_nmi(void);
+extern u8 __fastcall__ ppu_frame_count(void);
 
 /**
  * Nametable
  */
-#define NAMETABLE_0 0x2000
-#define ATTRIBUTE_TABLE_0 0x23C0
-#define NAMETABLE_1 0x2400
-#define ATTRIBUTE_TABLE_1 0x27C0
-#define NAMETABLE_2 0x2800
-#define ATTRIBUTE_TABLE_2 0x2BC0
-#define NAMETABLE_3 0x2C00
-#define ATTRIBUTE_TABLE_3 0x2FC0
+extern u8* NAMETABLE_0;
+extern u8* NAMETABLE_1;
+extern u8* NAMETABLE_2;
+extern u8* NAMETABLE_3;
 
 #define NT_WIDTH 32
 #define NT_HEIGHT 30
-#define NT0_ADDR(x,y) (NAMETABLE_0 | (y << 5) | x)
-#define NT1_ADDR(x,y) (NAMETABLE_1 | (y << 5) | x)
-#define NT2_ADDR(x,y) (NAMETABLE_2 | (y << 5) | x)
-#define NT3_ADDR(x,y) (NAMETABLE_3 | (y << 5) | x)
+#define NT0_ADDR(x,y) ((u16)(&NAMETABLE_0) | (y << 5) | x)
+#define NT1_ADDR(x,y) ((u16)(&NAMETABLE_1) | (y << 5) | x)
+#define NT2_ADDR(x,y) ((u16)(&NAMETABLE_2) | (y << 5) | x)
+#define NT3_ADDR(x,y) ((u16)(&NAMETABLE_3) | (y << 5) | x)
 
 /**
  * Palette
  */
-#define BACKGROUND_COLOR 0x3F00
-#define BACKGROUND_PALETTE_0 0x3F01
-#define BACKGROUND_PALETTE_1 0x3F05
-#define BACKGROUND_PALETTE_2 0x3F09
-#define BACKGROUND_PALETTE_3 0x3F0D
+typedef u8 nes_color;
+typedef struct {
+    nes_color background_color;
+    nes_color color_1;
+    nes_color color_2;
+    nes_color color_3;
+} nes_palette;
+
+extern nes_color __fastcall__ ppu_darken_color(nes_color color);
+extern nes_color __fastcall__ ppu_lighten_color(nes_color color);
+extern void __fastcall__ ppu_darken_bg(void);
+extern void __fastcall__ ppu_lighten_bg(void);
+extern void __fastcall__ ppu_bg_palette(const nes_palette* data);
+extern void __fastcall__ ppu_spr_palette(const nes_palette* data);
 
 #define DARK_GRAY 0x00
 #define DARK_AZURE 0x01
