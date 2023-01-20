@@ -146,26 +146,26 @@ LIGHTEN_COLORS: .byte $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
 
 ;void __fastcall__ ppu_darken_bg(void)
 .proc _ppu_darken_bg
-    ldx #$00
+    ldy #$00
 @1:
-    lda ZP_BG_PALETTE,x
+    lda ZP_BG_PALETTE,y
     jsr _ppu_darken_color
-    sta ZP_BG_PALETTE,x
-    inx
-    cpx #$10
+    sta ZP_BG_PALETTE,y
+    iny
+    cpy #$10
     bne @1
     jmp ppu_set_bg_palette_update
 .endproc
 
 ;void __fastcall__ ppu_lighten_bg(void)
 .proc _ppu_lighten_bg
-    ldx #$00
+    ldy #$00
 @1:
-    lda ZP_BG_PALETTE,x
+    lda ZP_BG_PALETTE,y
     jsr _ppu_lighten_color
-    sta ZP_BG_PALETTE,x
-    inx
-    cpx #$10
+    sta ZP_BG_PALETTE,y
+    iny
+    cpy #$10
     bne @1
     jmp ppu_set_bg_palette_update
 .endproc
