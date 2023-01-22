@@ -43,6 +43,8 @@ NAMETABLE_3 = $2C00
 ATTRIBUTE_TABLE_3 = $2FC0
 .export _ATTRIBUTE_TABLE_3 := ATTRIBUTE_TABLE_3
 
+NT_BUFFER = $0700
+
 BACKGROUND_PALETTE = $3F00
 SPRITE_PALETTE := $3F10
 
@@ -65,16 +67,10 @@ SPRITE_PALETTE := $3F10
 
 ;void __fastcall__ ppu_wait_nmi(void);
 .proc _ppu_wait_nmi
-    lda ZP_FRAME_CNT
+    lda ZP_PPU_FRAME_CNT
 @1:
-    cmp ZP_FRAME_CNT ;ZP_FRAME_CNT incremented at the end of NMI, once it changes we know the NMI happened
+    cmp ZP_PPU_FRAME_CNT ;ZP_PPU_FRAME_CNT incremented at the end of NMI, once it changes we know the NMI happened
     beq @1
-    rts
-.endproc
-
-;u8 __fastcall__ ppu_frame_count(void);
-.proc _ppu_frame_count
-    lda ZP_FRAME_CNT
     rts
 .endproc
 
@@ -85,7 +81,7 @@ SPRITE_PALETTE := $3F10
     rts
 .endproc
 
-; void __fastcall__ ppu_write(u8* data, u16 size);
+; void __fastcall__ ppu_write(const u8* data, u16 size);
 .import popax
 .proc _ppu_write
     sta ZP_LEN
@@ -95,7 +91,7 @@ SPRITE_PALETTE := $3F10
     stx ZP_PTR+1
     ldy #$00
 @1:
-    lda (ZP_PTR), y ; A = *PTR
+    lda (ZP_PTR),y  ; A = *PTR
     sta PPU_DATA    ; PPU_DATA = A
     inc ZP_PTR      ; ++PTR_LO
     bne @2          ; IF PTR_LO == 0
@@ -109,6 +105,69 @@ SPRITE_PALETTE := $3F10
 @3:
     dec ZP_LEN+1    ; ELSE LEN_HI--
     jmp @1          ; JMP @1
+.endproc
+
+; void __fastcall__ ppu_nmi_nt_update(const u8* data, u8 size, u8 nametable, u8 x, u8 y);
+.import popa
+.proc _ppu_nmi_nt_update
+    ldy ZP_NT_BUF_LEN
+    sta NT_BUFFER,y
+    jsr popax
+    sta ZP_PTR
+    stx ZP_PTR+1
+    lda ZP_PTR+1
+    asl
+    asl
+    sta ZP_PTR+1
+    ldy ZP_NT_BUF_LEN
+    lda NT_BUFFER,y
+    lsr
+    lsr
+    lsr
+    clc
+    adc ZP_PTR+1
+    sta ZP_PTR+1
+    lda NT_BUFFER,y
+    asl
+    asl
+    asl
+    asl
+    asl
+    clc
+    adc ZP_PTR
+    sta ZP_PTR
+    lda ZP_PTR+1
+    adc #>NAMETABLE_0
+    sta NT_BUFFER,y
+    iny
+    lda ZP_PTR
+    sta NT_BUFFER,y
+    iny
+    sty ZP_NT_BUF_LEN
+    jsr popax
+    ldy ZP_NT_BUF_LEN
+    clc
+    sbc #$00
+    sta ZP_LEN
+    sta NT_BUFFER,y
+    iny
+    sty ZP_NT_BUF_LEN
+    stx ZP_PTR
+    jsr popa
+    sta ZP_PTR+1
+    ldy ZP_LEN
+    tya
+    clc
+    adc ZP_NT_BUF_LEN
+    sta ZP_NT_BUF_LEN
+    tax
+@1:
+    lda (ZP_PTR),y
+    sta NT_BUFFER,x
+    dex
+    dey
+    bpl @1
+    rts
 .endproc
 
 .proc ppu_wait
@@ -133,14 +192,14 @@ LIGHTEN_COLORS: .byte $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
 ;nes_color __fastcall__ ppu_darken_color(nes_color color)
 .proc _ppu_darken_color
     tax
-    lda DARKEN_COLORS, x
+    lda DARKEN_COLORS,x
     rts
 .endproc
 
 ;nes_color __fastcall__ ppu_lighten_color(nes_color color)
 .proc _ppu_lighten_color
     tax
-    lda LIGHTEN_COLORS, x
+    lda LIGHTEN_COLORS,x
     rts
 .endproc
 

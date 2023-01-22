@@ -27,6 +27,9 @@ nmi:
     lda #<BACKGROUND_PALETTE
     ldx #>BACKGROUND_PALETTE
     jsr palette_copy
+    lda ZP_PPU_UPDATE
+    and #%11111110
+    sta ZP_PPU_UPDATE
 
 @update_spr_palette:
     lda ZP_PPU_UPDATE
@@ -37,11 +40,17 @@ nmi:
     lda #<SPRITE_PALETTE
     ldx #>SPRITE_PALETTE
     jsr palette_copy
+    lda ZP_PPU_UPDATE
+    and #%11111101
+    sta ZP_PPU_UPDATE
 
 @update_nametable:
-
+    lda ZP_NT_BUF_LEN
+    beq @update_ppu
+    jsr nametable_copy
     lda #$00
-    sta ZP_PPU_UPDATE
+    sta ZP_NT_BUF_LEN
+
 @update_ppu:
     lda ZP_SCROLL_X
     sta PPU_SCROLL
@@ -54,7 +63,7 @@ nmi:
     lda ZP_PPU_MASK
     sta PPU_MASK
 
-    inc ZP_FRAME_CNT
+    inc ZP_PPU_FRAME_CNT
     ;restore the registers
     pla
     tay
@@ -63,6 +72,28 @@ nmi:
     pla
 irq:
     rti
+
+.proc nametable_copy
+    ldx #$00
+@strt:
+    lda NT_BUFFER,x
+    sta PPU_ADDR
+    inx
+    lda NT_BUFFER,x
+    sta PPU_ADDR
+    inx
+    ldy NT_BUFFER,x
+    inx
+@cpy_buf:
+    lda NT_BUFFER,x
+    sta PPU_DATA
+    inx
+    dey
+    bne @cpy_buf
+    cpx ZP_NT_BUF_LEN
+    bcc @strt
+    rts
+.endproc
 
 ; A: low byte palette address
 ; X: hi byte palette address

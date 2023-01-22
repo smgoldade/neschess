@@ -8,12 +8,15 @@ typedef signed int s16;
 typedef unsigned long u32;
 typedef signed long s32;
 
-extern void __fastcall__ ppu_set_addr(u16 addr);
-extern void __fastcall__ ppu_write(const u8* data, u16 size);
 extern void __fastcall__ ppu_off(void);
 extern void __fastcall__ ppu_on(void);
 extern void __fastcall__ ppu_wait_nmi(void);
-extern u8 __fastcall__ ppu_frame_count(void);
+extern void __fastcall__ ppu_set_addr(u16 addr);
+extern void __fastcall__ ppu_write(const u8* data, u16 size);
+void __fastcall__ ppu_nmi_nt_update(const u8* data, u8 size, u8 nametable, u8 x, u8 y);
+
+extern u8 ZP_PPU_FRAME_CNT;
+#pragma zpsym ("ZP_PPU_FRAME_CNT");
 
 /**
  * Nametable
