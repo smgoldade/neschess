@@ -13,9 +13,9 @@ extern void __fastcall__ ppu_on(void);
 extern void __fastcall__ ppu_wait_nmi(void);
 extern void __fastcall__ ppu_set_addr(u16 addr);
 extern void __fastcall__ ppu_write(const u8* data, u16 size);
-void __fastcall__ ppu_nmi_nt_update(const u8* data, u8 size, u8 nametable, u8 x, u8 y);
+extern void __fastcall__ ppu_nmi_nt_update(const u8* data, u8 size, u8 nametable, u8 x, u8 y);
 
-extern u8 ZP_PPU_FRAME_CNT;
+extern const volatile u8 ZP_PPU_FRAME_CNT;
 #pragma zpsym ("ZP_PPU_FRAME_CNT");
 
 /**
