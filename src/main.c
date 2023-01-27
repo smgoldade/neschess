@@ -5,28 +5,37 @@
 
 nes_palette bg_palette[] = {
     {BLACK, WHITE, MEDIUM_GRAY, DARK_GRAY},
-    {BLACK, WHITE, MEDIUM_GRAY, DARK_GRAY},
-    {BLACK, WHITE, MEDIUM_GRAY, DARK_GRAY},
-    {BLACK, WHITE, MEDIUM_GRAY, DARK_GRAY}
+    {BLACK, LIGHT_RED, MEDIUM_RED, DARK_RED},
+    {BLACK, LIGHT_BLUE, MEDIUM_BLUE, DARK_BLUE},
+    {BLACK, LIGHT_GREEN, MEDIUM_GREEN, DARK_GREEN}
+};
+attribute_cell attribute_table[] = {
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
 };
 const u8 message[] = "Hello World!";
 const u8 clear[] = "\0\0\0\0\0\0\0\0\0\0\0\0";
 
 int main(void) {
-    u8 fd = 0;
-    u8 last_upd = 0;
-    u8 last_upd_pal = 0;
-    u8 level = 4;
-    u8 dir = 0;
-    u8 x = 0;
-    s8 x_dir = 1;
-    u8 y = 0;
-    s8 y_dir = -1;
+    static u8 fd = 0;
+    static u8 last_upd = 0;
+    static u8 last_upd_pal = 0;
+    static u8 level = 4;
+    static u8 dir = 0;
+    static u8 x = 0;
+    static s8 x_dir = 1;
+    static u8 y = 0;
+    static s8 y_dir = -1;
 
-    ppu_off();
-    ppu_bg_palette(bg_palette);
     ppu_on();
-
+    ppu_nmi_bg_pal_update(bg_palette);
+    ppu_nmi_at_update((const u8*)attribute_table, sizeof(attribute_table),0,0,0);
     while(1) {
         ppu_wait_nmi();
 
@@ -71,7 +80,7 @@ int main(void) {
             } else if (level == 6) {
                 dir = 0;
             }
-            ppu_bg_palette(bg_palette);
+            ppu_nmi_bg_pal_update(bg_palette);
         }
     }
     return 0;

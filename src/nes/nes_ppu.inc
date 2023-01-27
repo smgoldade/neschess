@@ -4,9 +4,11 @@
 .global BACKGROUND_PALETTE, SPRITE_PALETTE
 .global OAM_ADDR, OAM_DATA, OAM_DMA
 
-.global NT_BUFFER
+.global PPU_BUFFER
+.global OAM_BUFFER
 
-.global _ppu_off, _ppu_on, _ppu_wait_nmi, _ppu_frame_count, _ppu_set_addr, ppu_wait
-.global _ppu_write, _ppu_nmi_nt_update
+.global _ppu_off, _ppu_on, _ppu_wait_nmi, _ppu_frame_count, ppu_wait
+.global _ppu_set_addr, _ppu_write
+.global _ppu_nmi_nt_update, _ppu_nmi_at_update
 
-.global _ppu_darken_color, _ppu_lighten_color, _ppu_darken_bg, _ppu_lighten_bg, _ppu_bg_palette, _ppu_spr_palette
+.global _ppu_darken_color, _ppu_lighten_color, _ppu_darken_bg, _ppu_lighten_bg, _ppu_nmi_bg_pal_update, _ppu_nmi_spr_pal_update

@@ -43,7 +43,7 @@ NAMETABLE_3 = $2C00
 ATTRIBUTE_TABLE_3 = $2FC0
 .export _ATTRIBUTE_TABLE_3 := ATTRIBUTE_TABLE_3
 
-NT_BUFFER = $0700
+PPU_BUFFER = $0700
 
 BACKGROUND_PALETTE = $3F00
 SPRITE_PALETTE := $3F10
@@ -81,6 +81,12 @@ SPRITE_PALETTE := $3F10
     rts
 .endproc
 
+.proc ppu_wait
+    bit PPU_STATUS
+    bpl ppu_wait
+    rts
+.endproc
+
 ; void __fastcall__ ppu_write(const u8* data, u16 size);
 .import popax
 .proc _ppu_write
@@ -110,24 +116,24 @@ SPRITE_PALETTE := $3F10
 ; void __fastcall__ ppu_nmi_nt_update(const u8* data, u8 size, u8 nametable, u8 x, u8 y);
 .import popa
 .proc _ppu_nmi_nt_update
-    ldy ZP_NT_BUF_LEN
-    sta NT_BUFFER,y
+    ldy ZP_PPU_BUF_LEN
+    sta PPU_BUFFER,y
     jsr popax
     sta ZP_PTR
     stx ZP_PTR+1
-    lda ZP_PTR+1
+    txa
     asl
     asl
     sta ZP_PTR+1
-    ldy ZP_NT_BUF_LEN
-    lda NT_BUFFER,y
+    ldy ZP_PPU_BUF_LEN
+    lda PPU_BUFFER,y
     lsr
     lsr
     lsr
     clc
     adc ZP_PTR+1
     sta ZP_PTR+1
-    lda NT_BUFFER,y
+    lda PPU_BUFFER,y
     asl
     asl
     asl
@@ -138,41 +144,80 @@ SPRITE_PALETTE := $3F10
     sta ZP_PTR
     lda ZP_PTR+1
     adc #>NAMETABLE_0
-    sta NT_BUFFER,y
+    sta PPU_BUFFER,y
     iny
     lda ZP_PTR
-    sta NT_BUFFER,y
+    sta PPU_BUFFER,y
     iny
-    sty ZP_NT_BUF_LEN
+    sty ZP_PPU_BUF_LEN
     jsr popax
-    ldy ZP_NT_BUF_LEN
-    clc
-    sbc #$00
+    ldy ZP_PPU_BUF_LEN
     sta ZP_LEN
-    sta NT_BUFFER,y
+    sta PPU_BUFFER,y
     iny
-    sty ZP_NT_BUF_LEN
+    sty ZP_PPU_BUF_LEN
     stx ZP_PTR
     jsr popa
     sta ZP_PTR+1
     ldy ZP_LEN
     tya
     clc
-    adc ZP_NT_BUF_LEN
-    sta ZP_NT_BUF_LEN
+    adc ZP_PPU_BUF_LEN
+    sta ZP_PPU_BUF_LEN
     tax
 @1:
     lda (ZP_PTR),y
-    sta NT_BUFFER,x
+    sta PPU_BUFFER,x
     dex
     dey
     bpl @1
     rts
 .endproc
 
-.proc ppu_wait
-    bit PPU_STATUS
-    bpl ppu_wait
+; void __fastcall__ ppu_nmi_at_update(const u8* data, u8 size, u8 attribute_table, u8 x, u8 y);
+.import popa
+.proc _ppu_nmi_at_update
+    asl
+    asl
+    asl
+    sta ZP_PTR          ; ZP_PTR = Y*8
+    jsr popax
+    clc
+    adc ZP_PTR
+    adc #<ATTRIBUTE_TABLE_0
+    sta ZP_PTR          ; ZP_PTR = Y*8+X+attribute table low(0xC0)
+    txa
+    asl
+    asl
+    clc
+    adc #>ATTRIBUTE_TABLE_0
+    sta PPU_BUFFER,y     ; ZP_PTR = attribute table (0x23C0) + (table number*0x400) + Y*8 + X
+    iny
+    lda ZP_PTR
+    sta PPU_BUFFER,y
+    iny
+    sty ZP_PPU_BUF_LEN
+    jsr popax
+    ldy ZP_PPU_BUF_LEN
+    sta ZP_LEN
+    sta PPU_BUFFER,y
+    iny
+    sty ZP_PPU_BUF_LEN
+    stx ZP_PTR
+    jsr popa
+    sta ZP_PTR+1
+    ldy ZP_LEN
+    tya
+    clc
+    adc ZP_PPU_BUF_LEN
+    sta ZP_PPU_BUF_LEN
+    tax
+@1:
+    lda (ZP_PTR),y
+    sta PPU_BUFFER,x
+    dex
+    dey
+    bpl @1
     rts
 .endproc
 
@@ -203,69 +248,61 @@ LIGHTEN_COLORS: .byte $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
     rts
 .endproc
 
-;void __fastcall__ ppu_darken_bg(void)
-.proc _ppu_darken_bg
-    ldy #$00
-@1:
-    lda ZP_BG_PALETTE,y
-    jsr _ppu_darken_color
-    sta ZP_BG_PALETTE,y
-    iny
-    cpy #$10
-    bne @1
-    jmp ppu_set_bg_palette_update
-.endproc
-
-;void __fastcall__ ppu_lighten_bg(void)
-.proc _ppu_lighten_bg
-    ldy #$00
-@1:
-    lda ZP_BG_PALETTE,y
-    jsr _ppu_lighten_color
-    sta ZP_BG_PALETTE,y
-    iny
-    cpy #$10
-    bne @1
-    jmp ppu_set_bg_palette_update
-.endproc
-
-;void __fastcall__ ppu_bg_palette(const nes_palette* data);
-.proc _ppu_bg_palette
+;void __fastcall__ ppu_nmi_bg_pal_update(const nes_palette* data);
+.proc _ppu_nmi_bg_pal_update
     sta ZP_PTR
     stx ZP_PTR+1
+    ldy ZP_PPU_BUF_LEN
+    lda #>BACKGROUND_PALETTE
+    sta PPU_BUFFER,y
+    iny
+    lda #<BACKGROUND_PALETTE
+    sta PPU_BUFFER,y
+    iny
+    lda #$0F
+    sta PPU_BUFFER, y
+    iny
+    tya
+    clc
+    adc #$0F
+    tax
+    stx ZP_PPU_BUF_LEN
     ldy #$0F
 @1:
     lda (ZP_PTR),y
-    sta ZP_BG_PALETTE,y
+    sta PPU_BUFFER,x
+    dex
     dey
     bpl @1
-    jmp ppu_set_bg_palette_update
-.endproc
-
-.proc ppu_set_bg_palette_update
-    lda ZP_PPU_UPDATE
-    ora #%00000001
-    sta ZP_PPU_UPDATE
     rts
 .endproc
 
-;void __fastcall__ ppu_spr_palette(const nes_palette* data);
-.proc _ppu_spr_palette
+;void __fastcall__ ppu_nmi_spr_pal_update(const nes_palette* data);
+.proc _ppu_nmi_spr_pal_update
     sta ZP_PTR
     stx ZP_PTR+1
+    ldy ZP_PPU_BUF_LEN
+    lda #>SPRITE_PALETTE
+    sta PPU_BUFFER,y
+    iny
+    lda #<SPRITE_PALETTE
+    sta PPU_BUFFER,y
+    iny
+    lda #$0F
+    sta PPU_BUFFER, y
+    iny
+    tya
+    clc
+    adc #$0F
+    tax
+    stx ZP_PPU_BUF_LEN
     ldy #$0F
 @1:
     lda (ZP_PTR),y
-    sta ZP_SPR_PALETTE,y
+    sta PPU_BUFFER,x
+    dex
     dey
     bpl @1
-    jmp ppu_set_spr_palette_update
-.endproc
-
-.proc ppu_set_spr_palette_update
-    lda ZP_PPU_UPDATE
-    ora #%00000010
-    sta ZP_PPU_UPDATE
     rts
 .endproc
 
@@ -275,3 +312,5 @@ LIGHTEN_COLORS: .byte $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
 OAM_ADDR := $2003
 OAM_DATA := $2004
 OAM_DMA := $4014
+
+OAM_BUFFER := $0200

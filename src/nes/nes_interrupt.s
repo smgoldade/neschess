@@ -15,41 +15,17 @@ nmi:
     ; check if we're rendering, if not we dont update PPU memory
     lda ZP_PPU_MASK
     and #%00011000 ; show sprites or show background
-    bne @update_bg_palette
+    bne @update_ppu_mem
     jmp @update_ppu
 
-@update_bg_palette:
-    lda ZP_PPU_UPDATE
-    and #%00000001
-    beq @update_spr_palette
-    lda #ZP_BG_PALETTE
-    sta ZP_PTR
-    lda #<BACKGROUND_PALETTE
-    ldx #>BACKGROUND_PALETTE
-    jsr palette_copy
-    lda ZP_PPU_UPDATE
-    and #%11111110
-    sta ZP_PPU_UPDATE
-
-@update_spr_palette:
-    lda ZP_PPU_UPDATE
-    and #%00000010
-    beq @update_nametable
-    lda #ZP_SPR_PALETTE
-    sta ZP_PTR
-    lda #<SPRITE_PALETTE
-    ldx #>SPRITE_PALETTE
-    jsr palette_copy
-    lda ZP_PPU_UPDATE
-    and #%11111101
-    sta ZP_PPU_UPDATE
-
-@update_nametable:
-    lda ZP_NT_BUF_LEN
+@update_ppu_mem:
+    lda #>OAM_BUFFER
+    sta OAM_DMA
+    lda ZP_PPU_BUF_LEN
     beq @update_ppu
-    jsr nametable_copy
+    jsr ppu_memory_copy
     lda #$00
-    sta ZP_NT_BUF_LEN
+    sta ZP_PPU_BUF_LEN
 
 @update_ppu:
     lda ZP_SCROLL_X
@@ -73,24 +49,24 @@ nmi:
 irq:
     rti
 
-.proc nametable_copy
+.proc ppu_memory_copy
     ldx #$00
 @strt:
-    lda NT_BUFFER,x
+    lda PPU_BUFFER,x
     sta PPU_ADDR
     inx
-    lda NT_BUFFER,x
+    lda PPU_BUFFER,x
     sta PPU_ADDR
     inx
-    ldy NT_BUFFER,x
+    ldy PPU_BUFFER,x
     inx
 @cpy_buf:
-    lda NT_BUFFER,x
+    lda PPU_BUFFER,x
     sta PPU_DATA
     inx
     dey
     bne @cpy_buf
-    cpx ZP_NT_BUF_LEN
+    cpx ZP_PPU_BUF_LEN
     bcc @strt
     rts
 .endproc
