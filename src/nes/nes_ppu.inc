@@ -7,7 +7,8 @@
 .global PPU_BUFFER
 .global OAM_BUFFER
 
-.global _ppu_off, _ppu_on, _ppu_wait_nmi, _ppu_frame_count, ppu_wait
+.global _ppu_off, _ppu_on, _ppu_rendering, _ppu_show_left, _ppu_emphasis, _ppu_grayscale
+.global _ppu_wait_nmi, ppu_wait
 .global _ppu_set_addr, _ppu_write
 .global _ppu_nmi_nt_update, _ppu_nmi_at_update
 

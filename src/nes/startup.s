@@ -24,8 +24,6 @@ reset:
     ldx #$FF
     txs
     inx
-    stx PPU_CTRL ; this is zero anyways?
-    stx PPU_MASK ; this is also zero anyways?
     stx APU_DMC_FLAGS
 
 ppu_init:

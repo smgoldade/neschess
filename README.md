@@ -14,6 +14,7 @@ Build is via [CMake](https://cmake.org/), I recommend the [Ninja](https://ninja-
 ### Developer Setup
 The IDE I've personally used is [CLion](https://www.jetbrains.com/clion/).  
 The setup process is to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) w/Ubuntu.  
+Building cc65 from source instead of install from distribution was required at the time this project was started in order to get proper bitfield support.  
 Clone and build cc65 from source, and setup a toolchain in CLion with WSL, with the compiler being cl65.  
 I've included the .idea directory to help with CLion setup with a custom compiler setup and shared CMake profile that should then correctly build for you.
 

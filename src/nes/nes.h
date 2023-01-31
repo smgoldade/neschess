@@ -9,13 +9,37 @@ typedef unsigned long u32;
 typedef signed long s32;
 
 /**
- * Turns off the PPU background and sprite rendering
+ * Turns off the PPU background and sprite rendering. Change takes effect after next NMI interrupt
  */
 extern void __fastcall__ ppu_off(void);
 /**
- * Turns on the PPU background and sprite rendering
+ * Turns on the PPU background and sprite rendering. Change takes effect after next NMI interrupt
  */
 extern void __fastcall__ ppu_on(void);
+/**
+ * Adjusts the PPU's rendering settings. Change takes effect after next NMI interrupt
+ * @param background 0 to turn off, 1 to turn on
+ * @param sprite 0 to turn off, 1 to turn on
+ */
+extern void __fastcall__ ppu_rendering(u8 background, u8 sprite);
+/**
+ * Adjusts the PPU's show of the left most 8 pixels.
+ * @param background 0 to hide, 1 to show
+ * @param sprite 0 to hide, 1 to show
+ */
+extern void __fastcall__ ppu_show_left(u8 background, u8 sprite);
+/**
+ * Adjusts the PPU's emphasis settings
+ * @param red 0 to turn off, 1 to turn on
+ * @param green 0 to turn off, 1 to turn on
+ * @param blue 0 to turn off, 1 to turn on
+ */
+extern void __fastcall__ ppu_emphasis(u8 red, u8 green, u8 blue);
+/**
+ * Adjusts the PPU's grayscale setting
+ * @param enable 0 to turn off, 1 to turn on
+ */
+extern void __fastcall__ ppu_greyscale(u8 enable);
 /**
  * Waits until the next VBlank NMI finishes, then returns
  */
@@ -32,6 +56,8 @@ extern void __fastcall__ ppu_set_addr(u16 addr);
  */
 extern void __fastcall__ ppu_write(const u8* data, u16 size);
 
+
+
 extern const volatile u8 ZP_PPU_FRAME_CNT;
 #pragma zpsym ("ZP_PPU_FRAME_CNT");
 
@@ -46,8 +72,8 @@ extern const volatile u8 ZP_PPU_FRAME_CNT;
  * @param data the data to copy to the nametable
  * @param size the size of the data to copy
  * @param nametable the nametable to copy to (0-3)
- * @param x the x value on the nametable for the start of the data
- * @param y the y value on the nametable for the start of the data
+ * @param x the x value on the nametable for the start of the data (0-31) (32 is like writing to the next line)
+ * @param y the y value on the nametable for the start of the data (0-29) (30 & 31 will write attribute table!) (32 wraps back to 0)
  */
 extern void __fastcall__ ppu_nmi_nt_update(const u8* data, u8 size, u8 nametable, u8 x, u8 y);
 

@@ -65,6 +65,117 @@ SPRITE_PALETTE := $3F10
     jmp _ppu_wait_nmi
 .endproc
 
+;void __fastcall__ ppu_rendering(u8 background, u8 sprite);
+.import popa
+.proc _ppu_rendering
+    and #$01
+    beq @clr_sprite
+    lda ZP_PPU_MASK
+    ora #%00010000
+    sta ZP_PPU_MASK
+    jmp @test_background
+@clr_sprite:
+    lda ZP_PPU_MASK
+    and #%11101111
+    sta ZP_PPU_MASK
+@test_background:
+    jsr popa
+    and #$01
+    beq @clr_background
+    lda ZP_PPU_MASK
+    ora #%00001000
+    sta ZP_PPU_MASK
+    jmp _ppu_wait_nmi
+@clr_background:
+    lda ZP_PPU_MASK
+    and #%11110111
+    sta ZP_PPU_MASK
+    jmp _ppu_wait_nmi
+.endproc
+
+;void __fastcall__ ppu_show_left(u8 background, u8 sprite);
+.import popa
+.proc _ppu_show_left
+    and #$01
+    beq @clr_sprite
+    lda ZP_PPU_MASK
+    ora #%00000100
+    sta ZP_PPU_MASK
+    jmp @test_background
+@clr_sprite:
+    lda ZP_PPU_MASK
+    and #%11111011
+    sta ZP_PPU_MASK
+@test_background:
+    jsr popa
+    and #$01
+    beq @clr_background
+    lda ZP_PPU_MASK
+    ora #%00000010
+    sta ZP_PPU_MASK
+    rts
+@clr_background:
+    lda ZP_PPU_MASK
+    and #%11111101
+    sta ZP_PPU_MASK
+    rts
+.endproc
+
+;void __fastcall__ ppu_emphasis(u8 red, u8 green, u8 blue);
+.import popax
+.proc _ppu_emphasis
+    and #$01
+    beq @clr_blue
+    lda ZP_PPU_MASK
+    ora #%10000000
+    sta ZP_PPU_MASK
+    jmp @test_green
+@clr_blue:
+    lda ZP_PPU_MASK
+    and #%01111111
+    sta ZP_PPU_MASK
+@test_green:
+    jsr popax
+    and #$01
+    beq @clr_green
+    lda ZP_PPU_MASK
+    ora #%01000000
+    sta ZP_PPU_MASK
+    jmp @test_red
+@clr_green:
+    lda ZP_PPU_MASK
+    and #%10111111
+    sta ZP_PPU_MASK
+@test_red:
+    txa
+    and #$01
+    beq @clr_red
+    lda ZP_PPU_MASK
+    ora #%00100000
+    sta ZP_PPU_MASK
+    rts
+@clr_red:
+    lda ZP_PPU_MASK
+    and #%11011111
+    sta ZP_PPU_MASK
+    rts
+.endproc
+
+;void __fastcall__ ppu_grayscale(u8 enable);
+.proc _ppu_grayscale
+    and #$01
+    beq @clr_grayscale
+    lda ZP_PPU_MASK
+    ora #%00000001
+    sta ZP_PPU_MASK
+    rts
+@clr_grayscale:
+    lda ZP_PPU_MASK
+    and #%11111110
+    sta ZP_PPU_MASK
+    rts
+.endproc
+
 ;void __fastcall__ ppu_wait_nmi(void);
 .proc _ppu_wait_nmi
     lda ZP_PPU_FRAME_CNT
@@ -116,62 +227,26 @@ SPRITE_PALETTE := $3F10
 ; void __fastcall__ ppu_nmi_nt_update(const u8* data, u8 size, u8 nametable, u8 x, u8 y);
 .import popa
 .proc _ppu_nmi_nt_update
-    ldy ZP_PPU_BUF_LEN
-    sta PPU_BUFFER,y
-    jsr popax
-    sta ZP_PTR
+    ldx #$00
     stx ZP_PTR+1
+    asl
+    asl
+    asl
+    asl                     ; Max Y of 29 means first 3 shifts cant roll into the high byte, but next 2 can!
+    rol ZP_PTR+1            ; This has a net effect of (y & 0x1F) << 5
+    asl
+    sta ZP_PTR
+    rol ZP_PTR+1            ; ZP_PTR = Y*32
+    jsr popax
+    adc ZP_PTR
+    sta ZP_PTR              ; ZP_PTR = Y*32 + X
     txa
     asl
     asl
-    sta ZP_PTR+1
-    ldy ZP_PPU_BUF_LEN
-    lda PPU_BUFFER,y
-    lsr
-    lsr
-    lsr
     clc
     adc ZP_PTR+1
-    sta ZP_PTR+1
-    lda PPU_BUFFER,y
-    asl
-    asl
-    asl
-    asl
-    asl
-    clc
-    adc ZP_PTR
-    sta ZP_PTR
-    lda ZP_PTR+1
     adc #>NAMETABLE_0
-    sta PPU_BUFFER,y
-    iny
-    lda ZP_PTR
-    sta PPU_BUFFER,y
-    iny
-    sty ZP_PPU_BUF_LEN
-    jsr popax
-    ldy ZP_PPU_BUF_LEN
-    sta ZP_LEN
-    sta PPU_BUFFER,y
-    iny
-    sty ZP_PPU_BUF_LEN
-    stx ZP_PTR
-    jsr popa
-    sta ZP_PTR+1
-    ldy ZP_LEN
-    tya
-    clc
-    adc ZP_PPU_BUF_LEN
-    sta ZP_PPU_BUF_LEN
-    tax
-@1:
-    lda (ZP_PTR),y
-    sta PPU_BUFFER,x
-    dex
-    dey
-    bpl @1
-    rts
+    jmp nt_copy_ppu_buffer
 .endproc
 
 ; void __fastcall__ ppu_nmi_at_update(const u8* data, u8 size, u8 attribute_table, u8 x, u8 y);
@@ -191,33 +266,48 @@ SPRITE_PALETTE := $3F10
     asl
     clc
     adc #>ATTRIBUTE_TABLE_0
-    sta PPU_BUFFER,y     ; ZP_PTR = attribute table (0x23C0) + (table number*0x400) + Y*8 + X
+    jmp nt_copy_ppu_buffer
+.endproc
+
+; Shared nametable copy logic
+; A = Destination High Byte
+; <ZP_PTR = Destination Low Byte
+; C Stack: SRC_LEN SRC_LO SRC_HI
+.proc nt_copy_ppu_buffer
+    ldy ZP_PPU_BUF_LEN
+    sta PPU_BUFFER,y    ; PPU_BUFFER = DEST_HI
     iny
     lda ZP_PTR
-    sta PPU_BUFFER,y
+    sta PPU_BUFFER,y    ; PPU_BUFFER = DEST_HI DEST_LO
     iny
     sty ZP_PPU_BUF_LEN
     jsr popax
     ldy ZP_PPU_BUF_LEN
     sta ZP_LEN
-    sta PPU_BUFFER,y
+    sta PPU_BUFFER,y    ; PPU_BUFFER = DEST_HI DEST_LO SRC_LEN
     iny
     sty ZP_PPU_BUF_LEN
-    stx ZP_PTR
+    stx ZP_PTR          ; <ZP_PTR = SRC_LO
     jsr popa
-    sta ZP_PTR+1
+    sta ZP_PTR+1        ; ZP_PTR = SRC
     ldy ZP_LEN
     tya
     clc
     adc ZP_PPU_BUF_LEN
-    sta ZP_PPU_BUF_LEN
+    sta ZP_PPU_BUF_LEN  ; ZP_PPU_BUF_LEN = indexof PPU_BUFFER last data byte
     tax
-@1:
+    jmp copy_ppu_buffer
+.endproc
+
+; Y = SRC_LEN
+; X = indexof PPU_BUFFER last data byte
+; ZP_PTR = SRC
+.proc copy_ppu_buffer
     lda (ZP_PTR),y
     sta PPU_BUFFER,x
     dex
     dey
-    bpl @1
+    bpl copy_ppu_buffer
     rts
 .endproc
 
@@ -254,27 +344,8 @@ LIGHTEN_COLORS: .byte $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
     stx ZP_PTR+1
     ldy ZP_PPU_BUF_LEN
     lda #>BACKGROUND_PALETTE
-    sta PPU_BUFFER,y
-    iny
-    lda #<BACKGROUND_PALETTE
-    sta PPU_BUFFER,y
-    iny
-    lda #$0F
-    sta PPU_BUFFER, y
-    iny
-    tya
-    clc
-    adc #$0F
-    tax
-    stx ZP_PPU_BUF_LEN
-    ldy #$0F
-@1:
-    lda (ZP_PTR),y
-    sta PPU_BUFFER,x
-    dex
-    dey
-    bpl @1
-    rts
+    ldx #<BACKGROUND_PALETTE
+    jmp pal_copy_ppu_buffer
 .endproc
 
 ;void __fastcall__ ppu_nmi_spr_pal_update(const nes_palette* data);
@@ -283,27 +354,28 @@ LIGHTEN_COLORS: .byte $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
     stx ZP_PTR+1
     ldy ZP_PPU_BUF_LEN
     lda #>SPRITE_PALETTE
+    ldx #<SPRITE_PALETTE
+    jmp pal_copy_ppu_buffer
+.endproc
+
+; A = PAL_HI
+; X = PAL_LO
+.proc pal_copy_ppu_buffer
     sta PPU_BUFFER,y
     iny
-    lda #<SPRITE_PALETTE
+    txa
     sta PPU_BUFFER,y
     iny
-    lda #$0F
+    lda #$10
     sta PPU_BUFFER, y
     iny
     tya
     clc
-    adc #$0F
+    adc #$10
     tax
     stx ZP_PPU_BUF_LEN
-    ldy #$0F
-@1:
-    lda (ZP_PTR),y
-    sta PPU_BUFFER,x
-    dex
-    dey
-    bpl @1
-    rts
+    ldy #$10
+    jmp copy_ppu_buffer
 .endproc
 
 ;--------------------------
