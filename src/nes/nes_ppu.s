@@ -72,23 +72,22 @@ SPRITE_PALETTE := $3F10
     beq @clr_sprite
     lda ZP_PPU_MASK
     ora #%00010000
-    sta ZP_PPU_MASK
     jmp @test_background
 @clr_sprite:
     lda ZP_PPU_MASK
     and #%11101111
-    sta ZP_PPU_MASK
 @test_background:
+    sta ZP_PPU_MASK
     jsr popa
     and #$01
     beq @clr_background
     lda ZP_PPU_MASK
     ora #%00001000
-    sta ZP_PPU_MASK
-    jmp _ppu_wait_nmi
+    jmp @end
 @clr_background:
     lda ZP_PPU_MASK
     and #%11110111
+@end:
     sta ZP_PPU_MASK
     jmp _ppu_wait_nmi
 .endproc
@@ -100,23 +99,22 @@ SPRITE_PALETTE := $3F10
     beq @clr_sprite
     lda ZP_PPU_MASK
     ora #%00000100
-    sta ZP_PPU_MASK
     jmp @test_background
 @clr_sprite:
     lda ZP_PPU_MASK
     and #%11111011
-    sta ZP_PPU_MASK
 @test_background:
+    sta ZP_PPU_MASK
     jsr popa
     and #$01
     beq @clr_background
     lda ZP_PPU_MASK
     ora #%00000010
-    sta ZP_PPU_MASK
-    rts
+    jmp @end
 @clr_background:
     lda ZP_PPU_MASK
     and #%11111101
+@end:
     sta ZP_PPU_MASK
     rts
 .endproc
@@ -128,35 +126,33 @@ SPRITE_PALETTE := $3F10
     beq @clr_blue
     lda ZP_PPU_MASK
     ora #%10000000
-    sta ZP_PPU_MASK
     jmp @test_green
 @clr_blue:
     lda ZP_PPU_MASK
     and #%01111111
-    sta ZP_PPU_MASK
 @test_green:
+    sta ZP_PPU_MASK
     jsr popax
     and #$01
     beq @clr_green
     lda ZP_PPU_MASK
     ora #%01000000
-    sta ZP_PPU_MASK
     jmp @test_red
 @clr_green:
     lda ZP_PPU_MASK
     and #%10111111
-    sta ZP_PPU_MASK
 @test_red:
+    sta ZP_PPU_MASK
     txa
     and #$01
     beq @clr_red
     lda ZP_PPU_MASK
     ora #%00100000
-    sta ZP_PPU_MASK
-    rts
+    jmp @end
 @clr_red:
     lda ZP_PPU_MASK
     and #%11011111
+@end:
     sta ZP_PPU_MASK
     rts
 .endproc
@@ -167,12 +163,107 @@ SPRITE_PALETTE := $3F10
     beq @clr_grayscale
     lda ZP_PPU_MASK
     ora #%00000001
-    sta ZP_PPU_MASK
-    rts
+    jmp @end
 @clr_grayscale:
     lda ZP_PPU_MASK
     and #%11111110
+@end:
     sta ZP_PPU_MASK
+    rts
+.endproc
+
+;void __fastcall__ ppu_scroll(u8 x, u8 y);
+.import popa
+.proc _ppu_scroll
+    sta ZP_SCROLL_Y
+    jsr popa
+    sta ZP_SCROLL_X
+    rts
+.endproc
+
+;void __fastcall__ ppu_nametable(u8 nametable);
+.proc _ppu_nametable
+    and #$03
+    tax
+    lda ZP_PPU_CTRL
+    and #%11111100
+    sta ZP_PPU_CTRL
+    txa
+    ora ZP_PPU_CTRL
+    sta ZP_PPU_CTRL
+    rts
+.endproc
+
+;void __fastcall__ ppu_pattern_table(u8 background, u8 sprite);
+.import popa
+.proc _ppu_pattern_table
+    and #$01
+    beq @clr_sprite
+    lda ZP_PPU_CTRL
+    ora #%00001000
+    jmp @test_bg
+@clr_sprite:
+    lda ZP_PPU_CTRL
+    and #%1110111
+@test_bg:
+    sta ZP_PPU_CTRL
+    jsr popa
+    and #$01
+    beq @clr_bg
+    lda ZP_PPU_CTRL
+    ora #%00010000
+    jmp @end
+@clr_bg:
+    lda ZP_PPU_CTRL
+    and #%11101111
+@end:
+    sta ZP_PPU_CTRL
+    rts
+.endproc
+
+;void __fastcall__ ppu_sprite_size(u8 large);
+.proc _ppu_sprite_size
+    and #$01
+    beq @clr
+    lda ZP_PPU_CTRL
+    ora #%00100000
+    jmp @end
+@clr:
+    lda ZP_PPU_CTRL
+    and #%11011111
+@end:
+    sta ZP_PPU_CTRL
+    rts
+.endproc
+
+;void __fastcall__ ppu_master(u8 master);
+.proc _ppu_master
+    and #$01
+    beq @clr
+    lda ZP_PPU_CTRL
+    ora #%01000000
+    jmp @end
+@clr:
+    lda ZP_PPU_CTRL
+    and #%10111111
+@end:
+    sta ZP_PPU_CTRL
+    rts
+.endproc
+
+;void __fastcall__ ppu_nmi(u8 enable);
+.proc _ppu_nmi
+    and #$01
+    beq @clr
+    lda ZP_PPU_CTRL
+    ora #%10000000
+    jmp @end
+@clr:
+    lda ZP_PPU_CTRL
+    and #%01111111
+@end:
+    sta ZP_PPU_CTRL
+    sta PPU_CTRL
     rts
 .endproc
 
@@ -386,3 +477,4 @@ OAM_DATA := $2004
 OAM_DMA := $4014
 
 OAM_BUFFER := $0200
+.export _sprites := OAM_BUFFER

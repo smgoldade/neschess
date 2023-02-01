@@ -8,6 +8,7 @@
 .global OAM_BUFFER
 
 .global _ppu_off, _ppu_on, _ppu_rendering, _ppu_show_left, _ppu_emphasis, _ppu_grayscale
+.global _ppu_scroll, _ppu_nametable, _ppu_pattern_table, _ppu_sprite_size, _ppu_master
 .global _ppu_wait_nmi, ppu_wait
 .global _ppu_set_addr, _ppu_write
 .global _ppu_nmi_nt_update, _ppu_nmi_at_update

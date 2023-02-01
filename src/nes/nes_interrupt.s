@@ -1,4 +1,5 @@
 ; Author: Steven Goldade
+.include "nes_input.inc"
 .include "nes_interrupt.inc"
 .include "nes_ppu.inc"
 .include "nes_zeropage.inc"
@@ -16,18 +17,24 @@ nmi:
     lda ZP_PPU_MASK
     and #%00011000 ; show sprites or show background
     bne @update_ppu_mem
-    jmp @update_ppu
+    jmp @sample_controllers
 
 @update_ppu_mem:
-    lda #>OAM_BUFFER
-    sta OAM_DMA
     lda ZP_PPU_BUF_LEN
-    beq @update_ppu
+    beq @update_sprites
     jsr ppu_memory_copy
     lda #$00
     sta ZP_PPU_BUF_LEN
 
+@update_sprites:
+    lda #>OAM_BUFFER
+    sta OAM_DMA
+
+@sample_controllers:
+    jsr sample_controllers
+
 @update_ppu:
+    bit PPU_STATUS
     lda ZP_SCROLL_X
     sta PPU_SCROLL
     lda ZP_SCROLL_Y

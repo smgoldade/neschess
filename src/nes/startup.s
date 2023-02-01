@@ -68,6 +68,16 @@ clear_nametables:
     dey
     bne @1
 
+clear_sprites:
+    lda #$FF
+@1:
+    sta $0200, x
+    inx
+    inx
+    inx
+    inx
+    bne @1
+
     jsr copydata ; Compiler DATA section support
     ; Setup the Compiler Stack
     lda #<(__STACK_START__ + __STACK_SIZE__)

@@ -41,6 +41,39 @@ extern void __fastcall__ ppu_emphasis(u8 red, u8 green, u8 blue);
  */
 extern void __fastcall__ ppu_greyscale(u8 enable);
 /**
+ * Adjusts the PPU's scroll setting. Set at the next NMI.
+ * @param x the x value to scroll to
+ * @param y the y value to scroll to
+ */
+extern void __fastcall__ ppu_scroll(u8 x, u8 y);
+/**
+  * Adjusts the PPUs current rendered nametable. Set at the next NMI.
+  * Also known as a "coarse scroll"
+  * @param nametable
+  */
+extern void __fastcall__ ppu_nametable(u8 nametable);
+/**
+ * Adjusts the PPUs current pattern table for background and sprites. Set at the next NMI.
+ * @param background 0 or 1 for the appropriate pattern table
+ * @param sprite 0 or 1 for the appropriate pattern table
+ */
+extern void __fastcall__ ppu_pattern_table(u8 background, u8 sprite);
+/**
+ * Adjusts the PPUs current sprite size. Set at the next NMI.
+ * @param large 0: 8x8, 1: 8x16
+ */
+extern void __fastcall__ ppu_sprite_size(u8 large);
+/**
+ * Adjusts the PPUs current master/slave setting. Set at the next NMI.
+ * @param master 0: read backdrop from EXT, 1: output color on EXT
+ */
+extern void __fastcall__ ppu_master(u8 master);
+/**
+ * Adjusts the PPUs current NMI setting. Happens immediately.
+ * @param enable 0: off, 1: on
+ */
+extern void __fastcall__ ppu_nmi(u8 enable);
+/**
  * Waits until the next VBlank NMI finishes, then returns
  */
 extern void __fastcall__ ppu_wait_nmi(void);
@@ -55,8 +88,6 @@ extern void __fastcall__ ppu_set_addr(u16 addr);
  * @param size the length of the data to write
  */
 extern void __fastcall__ ppu_write(const u8* data, u16 size);
-
-
 
 extern const volatile u8 ZP_PPU_FRAME_CNT;
 #pragma zpsym ("ZP_PPU_FRAME_CNT");
@@ -90,10 +121,10 @@ extern const u8* NAMETABLE_3;
 #define NT3_ADDR(x,y) ((u16)(&NAMETABLE_3) | (y << 5) | x)
 
 typedef struct {
-    u8 bottom_right: 2;
-    u8 bottom_left: 2;
-    u8 top_right: 2;
     u8 top_left: 2;
+    u8 top_right: 2;
+    u8 bottom_left: 2;
+    u8 bottom_right: 2;
 } attribute_cell;
 
 extern const u8* ATTRIBUTE_TABLE_0;
@@ -220,4 +251,61 @@ extern void __fastcall__ ppu_nmi_spr_pal_update(const nes_palette* data);
 #define MIRROR_MEDIUM_GRAY 0x3D
 #define MIRROR_BLACK_4 0x3E
 #define MIRROR_BLACK_5 0x3F
+
+/**
+ * Sprites
+ */
+typedef struct {
+    u8 y;
+    u8 tile_index;
+    struct {
+        u8 palette : 2;
+        u8 unused : 3;
+        u8 priority : 1;
+        u8 horizontal_flip : 1;
+        u8 vertical_flip : 1;
+    } attributes;
+    u8 x;
+} sprite;
+extern sprite sprites[64];
+
+/**
+ * Input
+ */
+typedef struct {
+    u8 RIGHT : 1;
+    u8 LEFT : 1;
+    u8 DOWN : 1;
+    u8 UP : 1;
+    u8 START : 1;
+    u8 SELECT : 1;
+    u8 B : 1;
+    u8 A : 1;
+} controller;
+/**
+ * @return the currently held buttons on controller 1
+ */
+extern controller __fastcall__ input_c1_held();
+/**
+ * @return the just pressed buttons on controller 1
+ */
+extern controller __fastcall__  input_c1_pressed();
+/**
+ * @return the just released buttons on controller 1
+ */
+extern controller __fastcall__ input_c1_released();
+/**
+ * @return the currently held buttons on controller 2
+ */
+extern controller __fastcall__ input_c2_held();
+/**
+ * @return the just pressed buttons on controller 2
+ */
+extern controller __fastcall__ input_c2_pressed();
+/**
+ * @return the just released buttons on controller 2
+ */
+extern controller __fastcall__ input_c2_released();
+
+
 #endif
