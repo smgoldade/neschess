@@ -11,35 +11,22 @@ void player_init() {
     player.vel.x = 0;
     player.vel.y = 0;
 
-    player.sprite_id = 1;
-    sprites[player.sprite_id].x = 0;
-    sprites[player.sprite_id].y = 0;
-    sprites[player.sprite_id].attributes.palette = 0;
-    sprites[player.sprite_id].attributes.unused = 0;
-    sprites[player.sprite_id].attributes.priority = 0;
-    sprites[player.sprite_id].attributes.horizontal_flip = 0;
-    sprites[player.sprite_id].attributes.vertical_flip = 0;
-    sprites[player.sprite_id+1].x = 0;
-    sprites[player.sprite_id+1].y = 0;
-    sprites[player.sprite_id+1].attributes.palette = 0;
-    sprites[player.sprite_id+1].attributes.unused = 0;
-    sprites[player.sprite_id+1].attributes.priority = 0;
-    sprites[player.sprite_id+1].attributes.horizontal_flip = 0;
-    sprites[player.sprite_id+1].attributes.vertical_flip = 0;
-    sprites[player.sprite_id+2].x = 0;
-    sprites[player.sprite_id+2].y = 0;
-    sprites[player.sprite_id+2].attributes.palette = 0;
-    sprites[player.sprite_id+2].attributes.unused = 0;
-    sprites[player.sprite_id+2].attributes.priority = 0;
-    sprites[player.sprite_id+2].attributes.horizontal_flip = 0;
-    sprites[player.sprite_id+2].attributes.vertical_flip = 0;
-    sprites[player.sprite_id+3].x = 0;
-    sprites[player.sprite_id+3].y = 0;
-    sprites[player.sprite_id+3].attributes.palette = 0;
-    sprites[player.sprite_id+3].attributes.unused = 0;
-    sprites[player.sprite_id+3].attributes.priority = 0;
-    sprites[player.sprite_id+3].attributes.horizontal_flip = 0;
-    sprites[player.sprite_id+3].attributes.vertical_flip = 0;
+    player.sprite_1 = &sprites[1];
+    player.sprite_2 = &sprites[2];
+    player.sprite_3 = &sprites[3];
+    player.sprite_4 = &sprites[4];
+    player.sprite_1->x = 0;
+    player.sprite_1->y = 0;
+    player.sprite_1->attributes = 0;
+    player.sprite_2->x = 0;
+    player.sprite_2->y = 0;
+    player.sprite_2->attributes = 0;
+    player.sprite_3->x = 0;
+    player.sprite_3->y = 0;
+    player.sprite_3->attributes = 0;
+    player.sprite_4->x = 0;
+    player.sprite_4->y = 0;
+    player.sprite_4->attributes = 0;
 
     player.animation_state = 0;
     player.animation_timer = 0;
@@ -63,43 +50,43 @@ void player_direction_update() {
 }
 
 void player_metatile_update(u8 top_left, u8 top_right, u8 stand_left, u8 stand_right, u8 walk_left, u8 walk_right) {
-    sprites[player.sprite_id].x = (player.pos.x >> 8);
-    sprites[player.sprite_id].y = (player.pos.y >> 8);
-    sprites[player.sprite_id].attributes.horizontal_flip = 0;
+    player.sprite_1->x = (player.pos.x >> 8);
+    player.sprite_1->y = (player.pos.y >> 8);
+    SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_1, 0);
 
-    sprites[player.sprite_id+1].x = (player.pos.x >> 8) + 8;
-    sprites[player.sprite_id+1].y = (player.pos.y >> 8);
-    sprites[player.sprite_id+1].attributes.horizontal_flip = 0;
+    player.sprite_2->x = (player.pos.x >> 8) + 8;
+    player.sprite_2->y = (player.pos.y >> 8);
+    SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_2, 0);
 
-    sprites[player.sprite_id+2].x = (player.pos.x >> 8);
-    sprites[player.sprite_id+2].y = (player.pos.y >> 8) + 8;
-    sprites[player.sprite_id+2].attributes.horizontal_flip = 0;
+    player.sprite_3->x = (player.pos.x >> 8);
+    player.sprite_3->y = (player.pos.y >> 8) + 8;
+    SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_3, 0);
 
-    sprites[player.sprite_id+3].x = (player.pos.x >> 8) + 8;
-    sprites[player.sprite_id+3].y = (player.pos.y >> 8) + 8;
-    sprites[player.sprite_id+3].attributes.horizontal_flip = 0;
+    player.sprite_4->x = (player.pos.x >> 8) + 8;
+    player.sprite_4->y = (player.pos.y >> 8) + 8;
+    SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_4, 0);
 
     switch(player.animation_state) {
         default:
         case 0:
-            sprites[player.sprite_id].tile_index = top_left;
-            sprites[player.sprite_id+1].tile_index = top_right;
-            sprites[player.sprite_id+2].tile_index = stand_left;
-            sprites[player.sprite_id+3].tile_index = stand_right;
+            player.sprite_1->tile_index = top_left;
+            player.sprite_2->tile_index = top_right;
+            player.sprite_3->tile_index = stand_left;
+            player.sprite_4->tile_index = stand_right;
             break;
         case 1:
-            sprites[player.sprite_id].tile_index = top_left;
-            sprites[player.sprite_id+1].tile_index = top_right;
-            sprites[player.sprite_id+2].tile_index = walk_left;
-            sprites[player.sprite_id+3].tile_index = walk_right;
+            player.sprite_1->tile_index = top_left;
+            player.sprite_2->tile_index = top_right;
+            player.sprite_3->tile_index = walk_left;
+            player.sprite_4->tile_index = walk_right;
             break;
         case 2:
-            sprites[player.sprite_id].tile_index = top_left;
-            sprites[player.sprite_id+1].tile_index = top_right;
-            sprites[player.sprite_id+2].tile_index = walk_right;
-            sprites[player.sprite_id+2].attributes.horizontal_flip = 1;
-            sprites[player.sprite_id+3].tile_index = walk_left;
-            sprites[player.sprite_id+3].attributes.horizontal_flip = 1;
+            player.sprite_1->tile_index = top_left;
+            player.sprite_2->tile_index = top_right;
+            player.sprite_3->tile_index = walk_right;
+            SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_3, 1);
+            player.sprite_4->tile_index = walk_left;
+            SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_4, 1);
             break;
     }
 }
@@ -129,32 +116,32 @@ void player_sprite_update() {
         case DIRECTION_EAST:
         case DIRECTION_WEST:
             if(player.direction == DIRECTION_WEST) {
-                sprites[player.sprite_id].attributes.horizontal_flip = 1;
-                sprites[player.sprite_id+1].attributes.horizontal_flip = 1;
+                SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_1, 1);
+                SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_2, 1);
             } else {
-                sprites[player.sprite_id].attributes.horizontal_flip = 0;
-                sprites[player.sprite_id+1].attributes.horizontal_flip = 0;
+                SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_1, 0);
+                SPRITE_HORIZONTAL_FLIP_WRITE(player.sprite_2, 0);
             }
-            sprites[player.sprite_id].x = (player.pos.x >> 8);
-            sprites[player.sprite_id].y = (player.pos.y >> 8);
-            sprites[player.sprite_id+1].x = (player.pos.x >> 8);
-            sprites[player.sprite_id+1].y = (player.pos.y >> 8) + 8;
-            sprites[player.sprite_id+2].y = 0xFF;
-            sprites[player.sprite_id+3].y = 0xFF;
+            player.sprite_1->x = (player.pos.x >> 8);
+            player.sprite_1->y = (player.pos.y >> 8);
+            player.sprite_2->x = (player.pos.x >> 8);
+            player.sprite_2->y = (player.pos.y >> 8) + 8;
+            player.sprite_3->y = 0xFF;
+            player.sprite_4->y = 0xFF;
 
             switch(player.animation_state) {
                 default:
                 case 0:
-                    sprites[player.sprite_id].tile_index = SPRITE_CHARACTER_EAST_TOP;
-                    sprites[player.sprite_id+1].tile_index = SPRITE_CHARACTER_EAST_STAND;
+                    player.sprite_1->tile_index = SPRITE_CHARACTER_EAST_TOP;
+                    player.sprite_2->tile_index = SPRITE_CHARACTER_EAST_STAND;
                     break;
                 case 1:
-                    sprites[player.sprite_id].tile_index = SPRITE_CHARACTER_EAST_TOP;
-                    sprites[player.sprite_id+1].tile_index = SPRITE_CHARACTER_EAST_WALK_1;
+                    player.sprite_1->tile_index = SPRITE_CHARACTER_EAST_TOP;
+                    player.sprite_2->tile_index = SPRITE_CHARACTER_EAST_WALK_1;
                     break;
                 case 2:
-                    sprites[player.sprite_id].tile_index = SPRITE_CHARACTER_EAST_TOP;
-                    sprites[player.sprite_id+1].tile_index = SPRITE_CHARACTER_EAST_WALK_2;
+                    player.sprite_1->tile_index = SPRITE_CHARACTER_EAST_TOP;
+                    player.sprite_2->tile_index = SPRITE_CHARACTER_EAST_WALK_2;
                     break;
             }
             break;

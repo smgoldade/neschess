@@ -115,13 +115,6 @@ extern const u8* NAMETABLE_3;
 #define NT2_ADDR(x,y) ((u16)(&NAMETABLE_2) | (y << 5) | x)
 #define NT3_ADDR(x,y) ((u16)(&NAMETABLE_3) | (y << 5) | x)
 
-typedef struct {
-    u8 top_left: 2;
-    u8 top_right: 2;
-    u8 bottom_left: 2;
-    u8 bottom_right: 2;
-} attribute_cell;
-
 extern const u8* ATTRIBUTE_TABLE_0;
 extern const u8* ATTRIBUTE_TABLE_1;
 extern const u8* ATTRIBUTE_TABLE_2;
@@ -133,6 +126,14 @@ extern const u8* ATTRIBUTE_TABLE_3;
 #define AT1_ADDR(x,y) ((u16)(&ATTRIBUTE_TABLE_1) | (y << 3) | x)
 #define AT2_ADDR(x,y) ((u16)(&ATTRIBUTE_TABLE_2) | (y << 3) | x)
 #define AT3_ADDR(x,y) ((u16)(&ATTRIBUTE_TABLE_3) | (y << 3) | x)
+#define ATTRIBUTE_TOP_LEFT_READ(x) (x & 0x3)
+#define ATTRIBUTE_TOP_RIGHT_READ(x) ((x & 0xC) >> 2)
+#define ATTRIBUTE_BOTTOM_LEFT_READ(x) ((x & 0x30) >> 4)
+#define ATTRIBUTE_BOTTOM_RIGHT_READ(x) ((x & 0xC0) >> 6)
+#define ATTRIBUTE_TOP_LEFT_WRITE(x,y) x = (x & 0xFC) | (y & 0x3)
+#define ATTRIBUTE_TOP_RIGHT_WRITE(x,y) x = (x & 0xF3) | ((y & 0x3) << 2)
+#define ATTRIBUTE_BOTTOM_LEFT_WRITE(x,y) x = (x & 0xCF) | ((y & 0x3) << 4)
+#define ATTRIBUTE_BOTTOM_RIGHT_WRITE(x,y) x = (x & 0x3F) | ((y & 0x3) << 6)
 
 /**
  * Inserts data into the PPU update buffer to update the given attribute with the provided data.
@@ -253,54 +254,51 @@ extern void __fastcall__ ppu_nmi_spr_pal_update(const nes_palette* data);
 typedef struct {
     u8 y;
     u8 tile_index;
-    struct {
-        u8 palette : 2;
-        u8 unused : 3;
-        u8 priority : 1;
-        u8 horizontal_flip : 1;
-        u8 vertical_flip : 1;
-    } attributes;
+    u8 attributes;
     u8 x;
 } sprite;
 extern sprite sprites[64];
+#define SPRITE_PALETTE_WRITE(x,y) (x->attributes = (x->attributes & 0xE0) | (y & 0x3))
+#define SPRITE_PRIORITY_WRITE(x,y) (x->attributes = (x->attributes & 0xC3) | ((y & 0x1) << 5))
+#define SPRITE_HORIZONTAL_FLIP_WRITE(x,y) (x->attributes = (x->attributes & 0xA3) | ((y & 0x1) << 6))
+#define SPRITE_VERTICAL_FLIP_WRITE(x,y) (x->attributes = (x->attributes & 0x63) | ((y & 0x1) << 7))
 
 /**
  * Input
  */
-typedef struct {
-    u8 RIGHT : 1;
-    u8 LEFT : 1;
-    u8 DOWN : 1;
-    u8 UP : 1;
-    u8 START : 1;
-    u8 SELECT : 1;
-    u8 B : 1;
-    u8 A : 1;
-} controller;
+#define BUTTON_RIGHT(x) (x & 0x1)
+#define BUTTON_LEFT(x) (x & 0x2)
+#define BUTTON_DOWN(x) (x & 0x4)
+#define BUTTON_UP(x) (x & 0x8)
+#define BUTTON_START(x) (x & 0x10)
+#define BUTTON_SELECT(x) (x & 0x20)
+#define BUTTON_B(x) (x & 0x40)
+#define BUTTON_A(x) (x & 0x80)
+
 /**
  * @return the currently held buttons on controller 1
  */
-extern controller __fastcall__ input_c1_held();
+extern u8 __fastcall__ input_c1_held();
 /**
  * @return the just pressed buttons on controller 1
  */
-extern controller __fastcall__  input_c1_pressed();
+extern u8 __fastcall__  input_c1_pressed();
 /**
  * @return the just released buttons on controller 1
  */
-extern controller __fastcall__ input_c1_released();
+extern u8 __fastcall__ input_c1_released();
 /**
  * @return the currently held buttons on controller 2
  */
-extern controller __fastcall__ input_c2_held();
+extern u8 __fastcall__ input_c2_held();
 /**
  * @return the just pressed buttons on controller 2
  */
-extern controller __fastcall__ input_c2_pressed();
+extern u8 __fastcall__ input_c2_pressed();
 /**
  * @return the just released buttons on controller 2
  */
-extern controller __fastcall__ input_c2_released();
+extern u8 __fastcall__ input_c2_released();
 
 
 #endif

@@ -16,29 +16,26 @@ nes_palette sprite_palette[] = {
     {MEDIUM_GRAY, LIGHT_BLUE, MEDIUM_BLUE, DARK_BLUE},
     {MEDIUM_GRAY, LIGHT_GREEN, MEDIUM_GREEN, DARK_GREEN}
 };
-attribute_cell attribute_table[] = {
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
-    {0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},{0,1,2,3},
+u8 attribute_table[] = {
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
+    0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,0x1B,
 };
 const u8 message[] = "Hello World!";
-const u8 clear[] = "\0\0\0\0\0\0\0\0\0\0\0\0";
 
 static u8 temp;
 static u8 temp2;
-static u8 temp3;
 static u8 last_upd;
 
-static controller controller_1;
+static u8 controller_1;
 
 void controller_update(void);
 void attribute_table_cycle(void);
-void update_player_sprite(void);
 
 int main(void) {
     ppu_on();
@@ -63,24 +60,24 @@ int main(void) {
 
 void controller_update(void) {
     controller_1 = input_c1_held();
-    if(controller_1.UP) {
-        player.vel.y -= 0x40;
+    if(BUTTON_UP(controller_1)) {
+        player.vel.y -= 0x20;
     }
-    if(controller_1.DOWN) {
-        player.vel.y += 0x40;
+    if(BUTTON_DOWN(controller_1)) {
+        player.vel.y += 0x20;
     }
-    if(controller_1.LEFT) {
-        player.vel.x -= 0x40;
+    if(BUTTON_LEFT(controller_1)) {
+        player.vel.x -= 0x20;
     }
-    if(controller_1.RIGHT) {
-        player.vel.x += 0x40;
+    if(BUTTON_RIGHT(controller_1)) {
+        player.vel.x += 0x20;
     }
 
     controller_1 = input_c1_released();
-    if(controller_1.UP || controller_1.DOWN) {
+    if(BUTTON_UP(controller_1) || BUTTON_DOWN(controller_1)) {
         player.vel.y = 0;
     }
-    if(controller_1.LEFT || controller_1.RIGHT) {
+    if(BUTTON_LEFT(controller_1) || BUTTON_RIGHT(controller_1)) {
         player.vel.x = 0;
     }
 
@@ -101,11 +98,12 @@ void controller_update(void) {
 void attribute_table_cycle(void) {
     temp = ZP_PPU_FRAME_CNT - last_upd;
 
-    if(temp > 4) {
-        last_upd = ZP_PPU_FRAME_CNT;
-        for(temp2 = 0; temp2 < 64; ++temp2) {
-            *((((u8*)attribute_table) + temp2)) += 0x55;
-        }
-        ppu_nmi_at_update((const u8*)attribute_table, sizeof(attribute_table),0,0,0);
+    if(temp < 5) {
+        return;
     }
+    last_upd = ZP_PPU_FRAME_CNT;
+    for(temp2 = 0; temp2 < 64; ++temp2) {
+        attribute_table[temp2] += 0x55;
+    }
+    ppu_nmi_at_update((const u8*)attribute_table, sizeof(attribute_table),0,0,0);
 }

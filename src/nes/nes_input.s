@@ -49,37 +49,37 @@ INPUT_CONTROLLER_2 := $4017
     rts
 .endproc
 
-;controller __fastcall__ input_c1_held();
+;u8 __fastcall__ input_c1_held();
 .proc _input_c1_held
     lda ZP_C1_HELD
     rts
 .endproc
 
-;controller __fastcall__ input_c1_pressed();
+;u8 __fastcall__ input_c1_pressed();
 .proc _input_c1_pressed
     lda ZP_C1_PRESSED
     rts
 .endproc
 
-;controller __fastcall__ input_c1_released();
+;u8 __fastcall__ input_c1_released();
 .proc _input_c1_released
     lda ZP_C1_RELEASED
     rts
 .endproc
 
-;controller __fastcall__ input_c2_held();
+;u8 __fastcall__ input_c2_held();
 .proc _input_c2_held
     lda ZP_C2_HELD
     rts
 .endproc
 
-;controller __fastcall__ input_c2_pressed();
+;u8 __fastcall__ input_c2_pressed();
 .proc _input_c2_pressed
     lda ZP_C2_PRESSED
     rts
 .endproc
 
-;controller __fastcall__ input_c2_released();
+;u8 __fastcall__ input_c2_released();
 .proc _input_c2_released
     lda ZP_C2_RELEASED
     rts

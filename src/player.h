@@ -8,10 +8,14 @@ typedef struct {
     position pos;
     velocity vel;
 
-    u8 sprite_id;
+    sprite* sprite_1;
+    sprite* sprite_2;
+    sprite* sprite_3;
+    sprite* sprite_4;
+
     u8 animation_timer;
-    u8 direction : 2;
-    u8 animation_state : 2;
+    u8 direction;
+    u8 animation_state;
 
 } player_t;
 
