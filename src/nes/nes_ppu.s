@@ -270,9 +270,14 @@ SPRITE_PALETTE := $3F10
 ;void __fastcall__ ppu_wait_nmi(void);
 .proc _ppu_wait_nmi
     lda ZP_PPU_FRAME_CNT
+    cmp ZP_LAST_FRAME
+    beq @1
+    inc ZP_LAG_COUNT
 @1:
     cmp ZP_PPU_FRAME_CNT ;ZP_PPU_FRAME_CNT incremented at the end of NMI, once it changes we know the NMI happened
     beq @1
+    lda ZP_PPU_FRAME_CNT
+    sta ZP_LAST_FRAME
     rts
 .endproc
 

@@ -1,12 +1,7 @@
 #ifndef _NES_H_
 #define _NES_H_
 
-typedef unsigned char u8;
-typedef char s8;
-typedef unsigned int u16;
-typedef signed int s16;
-typedef unsigned long u32;
-typedef signed long s32;
+#include "../types.h"
 
 /**
  * Turns off the PPU background and sprite rendering. Change takes effect after next NMI interrupt

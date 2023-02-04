@@ -9,6 +9,8 @@ ZP_SCROLL_X: .res 1
 ZP_SCROLL_Y: .res 1
 ZP_PPU_FRAME_CNT: .res 1
 ZP_PPU_BUF_LEN: .res 1
+ZP_LAG_COUNT: .res 1
+ZP_LAST_FRAME: .res 1
 ZP_CONTROLLER_1: .res 1
 ZP_CONTROLLER_2: .res 1
 ZP_C1_HELD: .res 1

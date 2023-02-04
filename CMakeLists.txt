@@ -7,6 +7,8 @@ set(C_STANDARD C99)
 add_executable(nesrpg)
 target_sources(nesrpg PRIVATE
         src/main.c
+        src/physics.c
+        src/player.c
         src/nes/ines.s
         src/nes/nes_apu.s
         src/nes/nes_input.s
