@@ -20,7 +20,7 @@ target_sources(nesrpg PRIVATE
 
 set_target_properties(nesrpg PROPERTIES
         OUTPUT_NAME "nesrpg.nes"
-        COMPILE_FLAGS "-t nes -v -g -Oirs --asm-define NODEBUG -T"
+        COMPILE_FLAGS "-t nes -v -g -Oirs -T"
         LINK_FLAGS "-t none -C ${CMAKE_CURRENT_SOURCE_DIR}/toolchain/nes.cfg -Ln labels.txt -v -vm -m nesrpg.map -Wl --dbgfile,nesrpg.dbg"
 )
 
