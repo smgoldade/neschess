@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CMakeSharedSettings">
     <configurations>
-      <configuration PROFILE_NAME="CC65" ENABLED="true" GENERATION_DIR="bin" CONFIG_NAME="Release" TOOLCHAIN_NAME="CC65" GENERATION_OPTIONS="-G Ninja -DCMAKE_TOOLCHAIN_FILE=toolchain/cc65-toolchain.cmake" />
+      <configuration PROFILE_NAME="LLVM-MOS" ENABLED="true" GENERATION_DIR="bin" CONFIG_NAME="MinSizeRel" TOOLCHAIN_NAME="LLVM-MOS" GENERATION_OPTIONS="-G Ninja -DCMAKE_PREFIX_PATH=/usr/bin/llvm-mos" />
     </configurations>
   </component>
 </project>

@@ -46,9 +46,9 @@
 #define BIT_WRITE_5(x,y) (y ? BIT_SET_5(x) : BIT_CLEAR_5(x))
 #define BIT_WRITE_6(x,y) (y ? BIT_SET_6(x) : BIT_CLEAR_6(x))
 #define BIT_WRITE_7(x,y) (y ? BIT_SET_7(x) : BIT_CLEAR_7(x))
-#define BIT_WRITE_0_2(x,y) ((y == 0) ? BIT_CLEAR_0_2(x) : ((y == 1) ? BIT_SET_0(x) : ((y == 2) ? BIT_SET_1(x) : BIT_SET_0_2(x))))
-#define BIT_WRITE_2_2(x,y) ((y == 0) ? BIT_CLEAR_2_2(x) : ((y == 1) ? BIT_SET_2(x) : ((y == 2) ? BIT_SET_3(x) : BIT_SET_2_2(x))))
-#define BIT_WRITE_4_2(x,y) ((y == 0) ? BIT_CLEAR_4_2(x) : ((y == 1) ? BIT_SET_4(x) : ((y == 2) ? BIT_SET_5(x) : BIT_SET_4_2(x))))
-#define BIT_WRITE_6_2(x,y) ((y == 0) ? BIT_CLEAR_6_2(x) : ((y == 1) ? BIT_SET_6(x) : ((y == 2) ? BIT_SET_7(x) : BIT_SET_6_2(x))))
+#define BIT_WRITE_0_2(x,y) ((y == 0) ? BIT_CLEAR_0_2(x) : ((y == 1) ? (BIT_SET_0(x); BIT_CLEAR_1(x);) : ((y == 2) ? BIT_SET_1(x) : BIT_SET_0_2(x))))
+#define BIT_WRITE_2_2(x,y) ((y == 0) ? BIT_CLEAR_2_2(x) : ((y == 1) ? (BIT_SET_2(x); BIT_CLEAR_3(x);) : ((y == 2) ? BIT_SET_3(x) : BIT_SET_2_2(x))))
+#define BIT_WRITE_4_2(x,y) ((y == 0) ? BIT_CLEAR_4_2(x) : ((y == 1) ? (BIT_SET_4(x); BIT_CLEAR_5(x);) : ((y == 2) ? BIT_SET_5(x) : BIT_SET_4_2(x))))
+#define BIT_WRITE_6_2(x,y) ((y == 0) ? BIT_CLEAR_6_2(x) : ((y == 1) ? (BIT_SET_6(x); BIT_CLEAR_7(x);) : ((y == 2) ? BIT_SET_7(x) : BIT_SET_6_2(x))))
 
 #endif //_BITMATH_H_
