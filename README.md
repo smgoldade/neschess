@@ -1,6 +1,6 @@
-# nesrpg
-An RPG. Made for the NES!  
-At least that's the goal.
+# neschess
+Chess on the NES!  
+The long term goal of this project is to develop a powerful chess engine on the NES.
 
 ## Recognition
 This project derives pretty much all necessary information needed for programming the NES from
@@ -19,8 +19,8 @@ I've included the .idea directory to help with CLion setup with a custom compile
 
 ### Direct Build
     cmake -S. -B ./bin
-    cmake --build ./bin --target nesrpg -j 9
+    cmake --build ./bin --target neschess -j 9
 
 ### Output
-The output file is nesrpg.nes in the /bin directory.  
+The output file is neschess.nes in the /bin directory.  
 This can be run in an emulator like [mesen](https://www.mesen.ca/).  
