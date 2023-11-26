@@ -1,2 +1,3 @@
 .section .chr_rom,"aR",@progbits
-.incbin "../chrrom.chr"
+# The working directory starts in ../bin
+.incbin "./chrrom.chr"

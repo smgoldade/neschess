@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CMakeSharedSettings">
     <configurations>
-      <configuration PROFILE_NAME="LLVM-MOS" ENABLED="true" GENERATION_DIR="bin" CONFIG_NAME="MinSizeRel" TOOLCHAIN_NAME="LLVM-MOS" GENERATION_OPTIONS="-G Ninja -DCMAKE_PREFIX_PATH=/usr/bin/llvm-mos" />
+      <configuration PROFILE_NAME="LLVM-MOS" ENABLED="true" GENERATION_DIR="bin" CONFIG_NAME="MinSizeRel" TOOLCHAIN_NAME="LLVM-MOS" GENERATION_OPTIONS="-DCMAKE_PREFIX_PATH=/usr/bin/llvm-mos -DCMAKE_CROSSCOMPILING=true" NO_GENERATOR="true" />
     </configurations>
   </component>
 </project>
