@@ -4,25 +4,29 @@
  */
 #include "game_screen.h"
 #include <chess/move_generator.h>
+#include <nespp/apu.h>
 #include <nespp/compression.h>
 #include <nespp/error.h>
 #include <nespp/joypad.h>
 #include <nespp/ppu.h>
 
+using namespace nespp;
+using namespace chess;
+
 auto GameScreen::init() noexcept -> void {
     Ppu::wait();
-    if(NESChess::settings.player_side == chess::Side::NONE) {
+    if(NESChess::settings.player_side == Side::NONE) {
         switch(Ppu::get_frame_count() % 2) { // Random enough, but frame perfect start game would select a side
             case 0:
             default:
-                NESChess::settings.player_side = chess::Side::WHITE;
+                NESChess::settings.player_side = Side::WHITE;
                 break;
             case 1:
-                NESChess::settings.player_side = chess::Side::BLACK;
+                NESChess::settings.player_side = Side::BLACK;
                 break;
         }
     }
-    player_is_white = NESChess::settings.player_side == chess::Side::WHITE;
+    player_is_white = NESChess::settings.player_side == Side::WHITE;
     
     cursor_square = player_is_white ? Square::E2 : Square::E7;
     selected_square = Square::INVALID;
@@ -32,7 +36,6 @@ auto GameScreen::init() noexcept -> void {
     BufferedPpu::off();
     Ppu::wait();
 
-    Ppu::wait();
     BufferedPpu::control.nametable = 0;
     BufferedPpu::control.background_pattern_table = 0;
     BufferedPpu::control.sprite_pattern_table = 1;
@@ -84,10 +87,11 @@ auto GameScreen::init() noexcept -> void {
     
     state = State::FADE_IN;
     BufferedPpu::on();
-    
+    Apu::control() = {.value = 3};
     screen_fader.reset_frame(Ppu::get_frame_count());
     BufferedPpu::background_palette.write(PAL0);
     BufferedPpu::sprite_palette.write(SPRITE_PALETTE);
+
 }
 
 auto GameScreen::fade_in() noexcept -> void {
@@ -132,11 +136,12 @@ auto GameScreen::my_turn() noexcept -> void {
                     selected_square = cursor_square;
                     board_renderer.hide_square(selected_square);
                     piece_sprite.set_tile(PIECES[piece.piece_type()]);
+                    Apu::pulse_1.queue_note(Pitch::C4, Length::_180_BPM_EIGHTH, 7);
                 }
             } else {
-                auto const moves = chess::MoveGenerator::moves_for_piece(position, position.get_board().piece_at(selected_square));
+                auto const moves = MoveGenerator::moves_for_piece(position, position.get_board().piece_at(selected_square));
                 for(auto const & move : moves) {
-                    if(!chess::MoveGenerator::is_move_legal(position, move)) continue;
+                    if(!MoveGenerator::is_move_legal(position, move)) continue;
                     if(move.from_square() != selected_square || move.to_square() != cursor_square) continue;
 
                     // TODO: Promotion selection
@@ -146,6 +151,10 @@ auto GameScreen::my_turn() noexcept -> void {
                     board_renderer.render_move(position.get_board(), last_move);
                     selected_square = Square::INVALID;
                     state = State::OPPONENT_TURN;
+                    Apu::pulse_1.queue_note(Pitch::A4, Length::_180_BPM_EIGHTH, 7);
+                    Apu::pulse_2.queue_note(Pitch::C4, Length::_180_BPM_EIGHTH, 7);
+                    Apu::pulse_1.queue_note(Pitch::C4, Length::_180_BPM_EIGHTH, 7);
+                    Apu::pulse_2.queue_note(Pitch::C5, Length::_180_BPM_EIGHTH, 7);
                     return;
                 }
             }
@@ -199,7 +208,7 @@ auto GameScreen::opponent_turn() noexcept -> void {
         hourglass_sprite.tile_number = hourglass_state ? Tileset1::HOURGLASS : Tileset1::HOURGLASS_90;
     }
 
-    if(chess::MoveGenerator::in_checkmate(position)) {
+    if(MoveGenerator::in_checkmate(position)) {
         const u8 lose[] = "You WIN!";
         BufferedPpu::nametable_0.write_partial(lose, 8, 12, 4);
         state = State::GAME_OVER;
@@ -213,14 +222,14 @@ auto GameScreen::opponent_turn() noexcept -> void {
         nespp::Error::fatal_error("Error: Null Move", 16);
     }
     position.make_move(last_move);
-    if(chess::MoveGenerator::in_checkmate(position)) {
+    if(MoveGenerator::in_checkmate(position)) {
        const u8 lose[] = "You LOSE!";
        BufferedPpu::nametable_0.write_partial(lose, 9, 11, 4);
        state = State::GAME_OVER;
        return;
     }
 
-    if(chess::MoveGenerator::in_check(position)) {
+    if(MoveGenerator::in_check(position)) {
         const u8 check[] = "Check!";
         BufferedPpu::nametable_0.write_partial(check, 6, 13, 4);
     } else {
@@ -230,6 +239,9 @@ auto GameScreen::opponent_turn() noexcept -> void {
 
     board_renderer.render_move(position.get_board(), last_move);
     state = State::MY_TURN;
+    Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_EIGHTH, 7);
+    Apu::pulse_2.queue_note(Pitch::E5, Length::_180_BPM_EIGHTH, 7);
+    Apu::pulse_1.queue_note(Pitch::C4, Length::_180_BPM_EIGHTH, 7);
 }
 
 auto GameScreen::game_over() noexcept -> void {

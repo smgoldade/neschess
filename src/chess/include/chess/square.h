@@ -61,7 +61,6 @@ namespace chess {
         }
     }
     
-    
     enum class File : u8 {
         INVALID = 0,
         A = 1,
@@ -100,8 +99,7 @@ namespace chess {
         };
 
         constexpr Square() noexcept : value(INVALID) {}
-        constexpr explicit Square(const u8 index) noexcept : value(index & 0x88 ? INVALID : static_cast<Value>(index)) {}
-        constexpr Square(const u8 index, bool as88) noexcept : value(as88 ? static_cast<Value>(index) : static_cast<Value>(index + (index & 0xF8))) {}
+        constexpr explicit Square(const u8 index, bool as88 = true) noexcept : value(as88 ? static_cast<Value>(index) : static_cast<Value>(index + (index & 0xF8))) {}
         constexpr Square(const Value value) noexcept : value(value) {} // NOLINT(*-explicit-constructor)
         constexpr Square(const File file, const Rank rank) noexcept {
             if(file == File::INVALID || rank == Rank::INVALID) {

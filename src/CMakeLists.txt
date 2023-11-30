@@ -7,7 +7,7 @@ project(neschess CXX ASM)
 neschess_policy()
 add_executable(neschess)
 target_compile_features(neschess PRIVATE cxx_std_23)
-target_compile_options(neschess PRIVATE -Wall -Wextra -flto -g)
+target_compile_options(neschess PRIVATE -Wall -Wextra -flto "SHELL:-mllvm -hot-cold-split -mllvm -instcombine-code-sinking -mllvm -iterative-counter-promotion  -mllvm -cost-kind=code-size")
 target_sources(neschess PRIVATE
         chrrom.s
         game_screen.cpp

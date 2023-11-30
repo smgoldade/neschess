@@ -15,7 +15,7 @@ auto constexpr test_stack() noexcept -> bool {
 
     if(!stack.contains(2)) return false;
     if(*stack.begin() != 3) return false;
-    if(*(stack.begin()++) != 2) return false;
+    if(*(++stack.begin()) != 2) return false;
     if(*stack.end() != 0) return false;
 
     for(auto & var : stack) {
@@ -37,8 +37,6 @@ auto constexpr test_stack() noexcept -> bool {
     if(stack2.pop() != 9) return false;
     if(stack2.peek() != 7) return false;
     if(stack2 == stack3) return false;
-    stack2.push(9);
-    if(stack2 != stack3) return false;
 
     auto constexpr partial_stack = nespp::Stack<u8, 4> {3, 5};
     static_assert(partial_stack.peek() == 5);

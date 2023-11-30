@@ -25,7 +25,7 @@ namespace chess {
                     if(!MoveGenerator::is_move_legal(position, move)) continue;
                     if(best_move.is_null_move()) best_move = move;// TODO: Maybe find an actually good move?
 
-                    auto const basic_search = [&](s16 alpha, s16 beta) -> s16 {
+                    auto const basic_search = [&](s16 alpha, s16 beta) -> s16 { // NOLINT(*-no-recursion)
                         return static_cast<s16>(-search(position, depth - 1, ply + 1, alpha, beta));
                     };
 

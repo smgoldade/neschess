@@ -9,54 +9,45 @@
 #include <nespp/ppu.h>
 #include <new>
 
-using namespace nespp;
-using namespace chess;
-
 class BoardRenderer {
 public:
     constexpr BoardRenderer(bool black_on_bottom, u8 metatile_x, u8 metatile_y) :black_on_bottom(black_on_bottom), board_metatile_x(metatile_x), board_metatile_y(metatile_y) {}
     
-    auto constexpr render_full(const Board& board) const noexcept -> void {
+    auto constexpr render_full(const chess::Board& board) const noexcept -> void {
         render_pieces(board);
         render_border();
     }
-    auto constexpr render_move(const Board& board, const Move& move) const noexcept -> void {
-        nespp::Vector<Square, 4> rerender_squares;
+    auto constexpr render_move(const chess::Board& board, const chess::Move& move) const noexcept -> void {
+        nespp::Vector<chess::Square, 4> rerender_squares;
 
         auto const from_square = move.from_square();
-        if(!from_square.is_valid()) {
-            Error::fatal_error("Invalid FROM square in render", 29);
-        }
         auto const to_square = move.to_square();
-        if(!to_square.is_valid()) {
-            Error::fatal_error("Invalid TO square in render", 27);
-        }
 
         rerender_squares.push_back(from_square);
         rerender_squares.push_back(to_square);
         if(move.is_en_passant())
             rerender_squares.push_back(move.en_passant_square());
         if(move.is_king_side_castle()) {
-            if(move.from_square() == Square::E1) {
-                rerender_squares.push_back(Square::F1);
-                rerender_squares.push_back(Square::H1);
+            if(move.from_square() == chess::Square::E1) {
+                rerender_squares.push_back(chess::Square::F1);
+                rerender_squares.push_back(chess::Square::H1);
             } else {
-                rerender_squares.push_back(Square::F8);
-                rerender_squares.push_back(Square::H8);
+                rerender_squares.push_back(chess::Square::F8);
+                rerender_squares.push_back(chess::Square::H8);
             }
         }
         if(move.is_queen_side_castle()) {
-            if(move.from_square() == Square::E1) {
-                rerender_squares.push_back(Square::A1);
-                rerender_squares.push_back(Square::D1);
+            if(move.from_square() == chess::Square::E1) {
+                rerender_squares.push_back(chess::Square::A1);
+                rerender_squares.push_back(chess::Square::D1);
             } else {
-                rerender_squares.push_back(Square::A8);
-                rerender_squares.push_back(Square::D8);
+                rerender_squares.push_back(chess::Square::A8);
+                rerender_squares.push_back(chess::Square::D8);
             }
         }
 
         for(auto & square : rerender_squares) {
-            render_piece(BufferedPpu::nametable_0, board.piece_at(square));
+            render_piece(nespp::BufferedPpu::nametable_0, board.piece_at(square));
         }
     }
 
@@ -64,43 +55,35 @@ public:
         this->black_on_bottom = black_on_bottom;
     }
 
-    auto constexpr set_metatile_x(const u8 metatile_x) noexcept -> void {
-        board_metatile_x = metatile_x;
-    }
-
-    auto constexpr set_metatile_y(const u8 metatile_y) noexcept -> void {
-        board_metatile_x = metatile_y;
+    auto constexpr hide_square(const chess::Square& square) const noexcept -> void {
+        render_piece(nespp::BufferedPpu::nametable_0, chess::Piece(chess::PieceType::NONE, square));
     }
     
-    auto constexpr hide_square(const Square& square) const noexcept -> void {
-        render_piece(BufferedPpu::nametable_0, Piece(PieceType::NONE, square));
+    auto constexpr show_square(const chess::Board& board, const chess::Square& square) const noexcept -> void {
+        render_piece(nespp::BufferedPpu::nametable_0, board.piece_at(square));
     }
     
-    auto constexpr show_square(const Board& board, const Square& square) const noexcept -> void {
-        render_piece(BufferedPpu::nametable_0, board.piece_at(square));
-    }
-    
-    [[nodiscard]] auto constexpr square_metatile_x(const Square& square) const noexcept -> u8 {
+    [[nodiscard]] auto constexpr square_metatile_x(const chess::Square& square) const noexcept -> u8 {
         return board_metatile_x + (black_on_bottom ? 7-square.x() : square.x());
     }
     
-    [[nodiscard]] auto constexpr square_top_y(const Square& square) const noexcept -> u8 {
+    [[nodiscard]] auto constexpr square_top_y(const chess::Square& square) const noexcept -> u8 {
         return square_metatile_y(square) * 16 - 1;
     }
     
-    [[nodiscard]] auto constexpr square_bottom_y(const Square& square) const noexcept -> u8 {
+    [[nodiscard]] auto constexpr square_bottom_y(const chess::Square& square) const noexcept -> u8 {
         return square_top_y(square) + 15;
     }
     
-    [[nodiscard]] auto constexpr square_metatile_y(const Square& square) const noexcept -> u8 {
+    [[nodiscard]] auto constexpr square_metatile_y(const chess::Square& square) const noexcept -> u8 {
         return board_metatile_y + (black_on_bottom ? square.y() : 7-square.y());
     }
     
-    [[nodiscard]] auto constexpr square_left_x(const Square& square) const noexcept -> u8 {
+    [[nodiscard]] auto constexpr square_left_x(const chess::Square& square) const noexcept -> u8 {
         return square_metatile_x(square) * 16;
     }
     
-    [[nodiscard]] auto constexpr square_right_x(const Square& square) const noexcept -> u8 {
+    [[nodiscard]] auto constexpr square_right_x(const chess::Square& square) const noexcept -> u8 {
         return square_left_x(square) + 15;
     }
 
@@ -109,7 +92,7 @@ private:
     u8 board_metatile_x;
     u8 board_metatile_y;
     
-    static constexpr Metatile PIECES[13] = {
+    static constexpr nespp::Metatile PIECES[13] = {
         {Tileset0::PALETTE_3, Tileset0::PALETTE_3, Tileset0::PALETTE_3, Tileset0::PALETTE_3},
         {Tileset0::WHITE_PAWN},
         {Tileset0::WHITE_KNIGHT},
@@ -149,8 +132,8 @@ private:
     static constexpr u8 FILE_LABELS[8] = {'A','B','C','D','E','F','G','H'};
     static constexpr u8 RANK_LABELS[8] = {'1','2','3','4','5','6','7','8'};
     
-    template <VramAccessor T>
-    auto constexpr render_piece(const T& vram_accessor, const Piece& piece) const noexcept -> void {
+    template <nespp::VramAccessor T>
+    auto constexpr render_piece(const T& vram_accessor, const chess::Piece& piece) const noexcept -> void {
         auto & square = piece.square();
         const u8 metatile_x = square_metatile_x(square);
         const u8 metatile_y = square_metatile_y(square);
@@ -159,12 +142,12 @@ private:
         PIECES[piece.piece_type()].write_to(vram_accessor, tile_x, tile_y);
     }
     
-    auto constexpr render_pieces(const Board& board) const noexcept -> void {
-        auto attribute_table = Ppu::attribute_table_0.cpu_copy();
+    auto constexpr render_pieces(const chess::Board& board) const noexcept -> void {
+        auto attribute_table = nespp::Ppu::attribute_table_0.cpu_copy();
         attribute_table.read();
     
         for(u8 square_index = 0; square_index < 64; square_index++) {
-            auto const square = Square(square_index, false);
+            auto const square = chess::Square(square_index, false);
             auto const piece = board.piece_at(square);
         
             const u8 metatile_x = square_metatile_x(square);
@@ -176,12 +159,13 @@ private:
             const u8 attribute_sub_y = metatile_y % 2;
             const u8 attribute_index = attribute_y * 8 + attribute_x;
         
-            attribute_table.value[attribute_index].set(attribute_sub_x, attribute_sub_y, square.color() != SquareColor::WHITE);
-            render_piece(Ppu::nametable_0, piece);
+            attribute_table.value[attribute_index].set(attribute_sub_x, attribute_sub_y, square.color() != chess::SquareColor::WHITE);
+            render_piece(nespp::Ppu::nametable_0, piece);
         }
         attribute_table.write();
     }
     auto constexpr render_border() const noexcept -> void {
+        using namespace nespp;
         const u8 border_left_x = board_metatile_x*2 - 1;
         const u8 border_top_y = board_metatile_y*2 - 1;
         const u8 border_right_x = border_left_x + 17;

@@ -63,28 +63,28 @@ private:
     static constexpr u8 BLANK_SCREEN[] = {
         0x69, 0x00, 0x69, 0xFF, 0x00, 0x69, 0xFF, 0x00, 0x69, 0xFF, 0x00, 0x69, 0xFF, 0x69, 0x00
     };
-    static constexpr Palette FINAL_PALETTE = {
-        Color::BLACK,
-        {Color::WHITE, Color::BLACK, Color::LIGHT_ORANGE},
-        Color::BLACK,
-        {Color::WHITE, Color::BLACK, Color::MEDIUM_ORANGE},
-        Color::BLACK,
-        {Color::WHITE, Color::MEDIUM_GRAY, Color::WHITE},
-        Color::BLACK,
-        {Color::DARK_RED, Color::MEDIUM_GRAY, Color::WHITE}
+    static constexpr nespp::Palette FINAL_PALETTE = {
+        nespp::Color::BLACK,
+        {nespp::Color::WHITE, nespp::Color::BLACK, nespp::Color::LIGHT_ORANGE},
+        nespp::Color::BLACK,
+        {nespp::Color::WHITE, nespp::Color::BLACK, nespp::Color::MEDIUM_ORANGE},
+        nespp::Color::BLACK,
+        {nespp::Color::WHITE, nespp::Color::MEDIUM_GRAY, nespp::Color::WHITE},
+        nespp::Color::BLACK,
+        {nespp::Color::DARK_RED, nespp::Color::MEDIUM_GRAY, nespp::Color::WHITE}
     };
-    static constexpr Palette PAL2 = FINAL_PALETTE.darken();
-    static constexpr Palette PAL1 = PAL2.darken();
-    static constexpr Palette PAL0 = PAL1.darken();
-    static constexpr Palette SPRITE_PALETTE = {
-        Color::BLACK,
-        {Color::WHITE, Color::BLACK, Color::LIGHT_ORANGE},
-        Color::BLACK,
-        {Color::WHITE, Color::BLACK, Color::MEDIUM_ORANGE},
-        Color::BLACK,
-        {Color::LIGHT_BLUE, Color::MEDIUM_BLUE, Color::WHITE},
-        Color::BLACK,
-        {Color::DARK_RED, Color::MEDIUM_GRAY, Color::WHITE}
+    static constexpr nespp::Palette PAL2 = FINAL_PALETTE.darken();
+    static constexpr nespp::Palette PAL1 = PAL2.darken();
+    static constexpr nespp::Palette PAL0 = PAL1.darken();
+    static constexpr nespp::Palette SPRITE_PALETTE = {
+        nespp::Color::BLACK,
+        {nespp::Color::WHITE, nespp::Color::BLACK, nespp::Color::LIGHT_ORANGE},
+        nespp::Color::BLACK,
+        {nespp::Color::WHITE, nespp::Color::BLACK, nespp::Color::MEDIUM_ORANGE},
+        nespp::Color::BLACK,
+        {nespp::Color::LIGHT_BLUE, nespp::Color::MEDIUM_BLUE, nespp::Color::WHITE},
+        nespp::Color::BLACK,
+        {nespp::Color::DARK_RED, nespp::Color::MEDIUM_GRAY, nespp::Color::WHITE}
     };
 
     static constexpr u8 FADE_DELAY = 5;
@@ -121,28 +121,28 @@ private:
         TO_TITLE,
     };
     State state;
-    Position position;
+    chess::Position position;
     BoardRenderer board_renderer;
     ScreenFader screen_fader;
     bool player_is_white;
     u8 last_update_frame;
     bool hourglass_state;
-    Square cursor_square;
-    Square selected_square;
-    Move last_move;
+    chess::Square cursor_square;
+    chess::Square selected_square;
+    chess::Move last_move;
     chess::AI ai;
 
-    PpuSprite& hourglass_sprite = Ppu::sprites[0];
-    PpuSprite& thinking_t_sprite = Ppu::sprites[1];
-    PpuSprite& thinking_h_sprite = Ppu::sprites[2];
-    PpuSprite& thinking_i_sprite = Ppu::sprites[3];
-    PpuSprite& thinking_n_sprite = Ppu::sprites[4];
-    PpuSprite& thinking_k_sprite = Ppu::sprites[5];
-    PpuSprite& thinking_i2_sprite = Ppu::sprites[6];
-    PpuSprite& thinking_n2_sprite = Ppu::sprites[7];
-    PpuSprite& thinking_g_sprite = Ppu::sprites[8];
-    Metasprite select_sprite = Metasprite(9, 12, 12);
-    Metasprite piece_sprite = Metasprite(13);
-    Metasprite move_from_sprite = Metasprite(17, 12, 12);
-    Metasprite move_to_sprite = Metasprite(21, 12, 12);
+    nespp::PpuSprite& hourglass_sprite = nespp::Ppu::sprites[0];
+    nespp::PpuSprite& thinking_t_sprite = nespp::Ppu::sprites[1];
+    nespp::PpuSprite& thinking_h_sprite = nespp::Ppu::sprites[2];
+    nespp::PpuSprite& thinking_i_sprite = nespp::Ppu::sprites[3];
+    nespp::PpuSprite& thinking_n_sprite = nespp::Ppu::sprites[4];
+    nespp::PpuSprite& thinking_k_sprite = nespp::Ppu::sprites[5];
+    nespp::PpuSprite& thinking_i2_sprite = nespp::Ppu::sprites[6];
+    nespp::PpuSprite& thinking_n2_sprite = nespp::Ppu::sprites[7];
+    nespp::PpuSprite& thinking_g_sprite = nespp::Ppu::sprites[8];
+    nespp::Metasprite select_sprite = nespp::Metasprite(9, 12, 12);
+    nespp::Metasprite piece_sprite = nespp::Metasprite(13);
+    nespp::Metasprite move_from_sprite = nespp::Metasprite(17, 12, 12);
+    nespp::Metasprite move_to_sprite = nespp::Metasprite(21, 12, 12);
 };

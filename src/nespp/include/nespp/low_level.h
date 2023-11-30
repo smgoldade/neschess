@@ -8,9 +8,12 @@
 #ifdef __mos6502__
     #define LEAF __attribute__((leaf))
     #define NONREENTRANT __attribute__((nonreentrant))
+    #define INTERRUPT __attribute__((interrupt))
+    #define INTERRUPT_NO_RECURSE __attribute__((interrupt_norecurse))
 #else
     #define LEAF
     #define NONREENTRANT
+    #define INTERRUPT
 #endif
 
 namespace nespp {

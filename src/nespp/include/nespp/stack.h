@@ -6,7 +6,7 @@
 #include "array.h"
 #include "container.h"
 #include "error.h"
-#include "reverse_iterator.h"
+#include "iterator.h"
 #include "types.h"
 
 namespace nespp {
@@ -15,8 +15,8 @@ namespace nespp {
     public:
         using data_type = T;
         using size_type = size_t;
-        using iterator = ReverseIterator<const T*>;
-        using const_iterator = ReverseIterator<const T* const>;
+        using iterator = ReverseIterator<T*>;
+        using const_iterator = ReverseIterator<const T*>;
 
         constexpr Stack() noexcept : internal_size(0), data(){};
         constexpr Stack(const std::initializer_list<T>& init) noexcept : data() {
@@ -64,10 +64,7 @@ namespace nespp {
         }
 
         [[nodiscard]] auto constexpr contains(const T& value) const noexcept -> bool {
-            for(size_type i = 0; i < internal_size; i++) {
-                if(data[i] == value) return true;
-            }
-            return false;
+            return container_contains(*this, value);
         }
 
         [[nodiscard]] auto constexpr empty() const noexcept -> bool {

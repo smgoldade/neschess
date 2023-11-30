@@ -4,6 +4,7 @@
  */
 #pragma once
 #include "container.h"
+#include "iterator.h"
 #include "types.h"
 #include <initializer_list>
 
@@ -12,7 +13,7 @@ namespace nespp {
     struct Array {
         using data_type = T;
         using size_type = size_t;
-        using iterator = const T*;
+        using iterator = T*;
         using const_iterator = const T*;
 
         constexpr Array() noexcept = default;
@@ -38,7 +39,7 @@ namespace nespp {
             return at(index);
         }
 
-        [[nodiscard]] auto constexpr index_of(const T& value) const noexcept -> size_t {
+        [[nodiscard]] auto constexpr index_of(const T& value) const noexcept -> size_type {
             for(size_type i=0; i<CAPACITY; ++i)
                 if(data[i] == value) return i;
             return CAPACITY;
@@ -61,10 +62,7 @@ namespace nespp {
         }
 
         [[nodiscard]] auto constexpr contains(const T& value) const noexcept -> bool {
-            for(size_type i = 0; i < CAPACITY; i++) {
-                if(data[i] == value) return true;
-            }
-            return false;
+            return container_contains(*this, value);
         }
 
         [[nodiscard]] auto consteval empty() const noexcept -> bool {

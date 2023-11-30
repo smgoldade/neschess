@@ -16,7 +16,7 @@ auto constexpr test_dropout_stack() noexcept -> bool {
 
    if(!stack.contains(2)) return false;
    if(*stack.begin() != 3) return false;
-   if(*(stack.begin()++) != 2) return false;
+   if(*(++stack.begin()) != 2) return false;
    if(*stack.end() != 4) return false;
 
    for(auto & var : stack) {

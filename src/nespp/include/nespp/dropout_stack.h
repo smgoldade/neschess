@@ -6,8 +6,8 @@
 #include "array.h"
 #include "container.h"
 #include "error.h"
+#include "circular_iterator.h"
 #include "nesmath.h"
-#include "reverse_iterator.h"
 #include "types.h"
 
 namespace nespp {
@@ -16,8 +16,8 @@ namespace nespp {
     public:
         using data_type = T;
         using size_type = size_t;
-        using iterator = ReverseIterator<const T*>;
-        using const_iterator = ReverseIterator<const T* const>;
+        using iterator = ReverseCircularIterator<T*, CAPACITY>;
+        using const_iterator = ReverseCircularIterator<const T*, CAPACITY>;
 
         constexpr DropoutStack() noexcept : pointer(0), count(0), data(){};
         constexpr DropoutStack(const std::initializer_list<T>& init) noexcept : pointer(init.size()), count(init.size()), data() {
@@ -50,19 +50,19 @@ namespace nespp {
         }
 
         [[nodiscard]] auto constexpr begin() const noexcept -> const_iterator {
-            return const_iterator{data.end()-1};
+            return const_iterator { data.begin(), static_cast<size_t>(count-pointer) };
         }
 
         auto constexpr begin() noexcept -> iterator {
-            return iterator{data.end()-1};
+            return iterator { data.begin(), static_cast<size_t>(count-pointer) };
         }
 
         [[nodiscard]] auto constexpr end() const noexcept -> const_iterator {
-            return const_iterator{data.begin()};
+            return const_iterator { data.begin(), static_cast<size_t>((pointer-1+count) % CAPACITY) };
         }
 
         auto constexpr end() noexcept -> iterator {
-            return iterator{data.begin()};
+            return iterator{ data.begin(), static_cast<size_t>((pointer-1+count) % CAPACITY)};
         }
 
         [[nodiscard]] auto constexpr contains(const T& value) const noexcept -> bool {

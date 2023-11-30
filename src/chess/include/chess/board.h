@@ -35,7 +35,6 @@ namespace chess {
                 }
                 this->board[i] = board[i];
             }
-
         }
     
         auto constexpr make_move(const Move& move) noexcept -> void {
@@ -153,13 +152,13 @@ namespace chess {
         auto constexpr grab_piece_reference(Piece& piece) -> PieceSet::ReferencedPiece {
             if(piece.side() == Side::WHITE) return white_pieces.grab_piece(piece);
             if(piece.side() == Side::BLACK) return black_pieces.grab_piece(piece);
-            return {piece, 0, nullptr};
+            return {piece, nullptr};
         }
 
         auto constexpr grab_captured_piece_reference(Piece& piece) -> PieceSet::ReferencedPiece {
             if(piece.side() == Side::WHITE) return white_pieces.grab_captured_piece(piece);
             if(piece.side() == Side::BLACK) return black_pieces.grab_captured_piece(piece);
-            return {piece, 0, nullptr};
+            return {piece, nullptr};
         }
 
         auto constexpr set_piece(const PieceSet::ReferencedPiece& piece) -> void {

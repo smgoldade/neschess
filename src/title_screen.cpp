@@ -5,10 +5,10 @@
 #include "title_screen.h"
 #include "nespp/include/nespp/nesmath.h"
 #include "tileset.h"
+#include <nespp/apu.h>
 #include <nespp/compression.h>
 #include <nespp/joypad.h>
 
-using namespace nespp;
 using namespace nespp;
 
 auto TitleScreen::init() noexcept -> void {
@@ -55,6 +55,7 @@ auto TitleScreen::init() noexcept -> void {
     BufferedPpu::background_palette.write(PAL0);
     BufferedPpu::sprite_palette.write(SPRITE_PALETTE);
     screen_fader.reset_frame(Ppu::get_frame_count());
+    Apu::control() = {.value = 3};
 }
 
 auto TitleScreen::fade_in() noexcept -> void {
@@ -68,7 +69,6 @@ auto TitleScreen::fade_in() noexcept -> void {
 auto TitleScreen::running() noexcept -> void {
     Ppu::wait();
 
-    
     switch(NESChess::settings.player_side) {
         case chess::Side::WHITE:
             side_sprite.tile_number = Tileset0::SMALL_KNIGHT;
@@ -94,19 +94,40 @@ auto TitleScreen::running() noexcept -> void {
             left_cursor_sprite.y = NESChess::settings.player_side == chess::Side::WHITE ? 255 : 172;
             right_cursor_sprite.x = 136;
             right_cursor_sprite.y = NESChess::settings.player_side == chess::Side::NONE ? 255 : 172;
-            if(Joypad1::released.down) cursor_position = CursorPosition::DIFFICULTY;
-            if(Joypad1::released.left) NESChess::settings.player_side = NESChess::settings.player_side == chess::Side::NONE ? chess::Side::BLACK : chess::Side::WHITE;
-            if(Joypad1::released.right) NESChess::settings.player_side = NESChess::settings.player_side == chess::Side::WHITE ? chess::Side::BLACK : chess::Side::NONE;
+            if(Joypad1::released.down) {
+                cursor_position = CursorPosition::DIFFICULTY;
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
+            if(Joypad1::released.left) {
+                NESChess::settings.player_side = NESChess::settings.player_side == chess::Side::NONE ? chess::Side::BLACK : chess::Side::WHITE;
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
+            if(Joypad1::released.right) {
+                NESChess::settings.player_side = NESChess::settings.player_side == chess::Side::WHITE ? chess::Side::BLACK : chess::Side::NONE;
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
             break;
         case CursorPosition::DIFFICULTY:
             left_cursor_sprite.x = 112;
             left_cursor_sprite.y = NESChess::settings.difficulty == 1 ? 255 : 196;
             right_cursor_sprite.x = 136;
             right_cursor_sprite.y = NESChess::settings.difficulty == 5 ? 255 : 196;
-            if(Joypad1::released.up) cursor_position = CursorPosition::SIDE;
-            if(Joypad1::released.down) cursor_position = CursorPosition::PLAY;
-            if(Joypad1::released.left) NESChess::settings.difficulty = max(1, NESChess::settings.difficulty - 1);
-            if(Joypad1::released.right) NESChess::settings.difficulty = min(5, NESChess::settings.difficulty + 1);
+            if(Joypad1::released.up) {
+                cursor_position = CursorPosition::SIDE;
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
+            if(Joypad1::released.down) {
+                cursor_position = CursorPosition::PLAY;
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
+            if(Joypad1::released.left) {
+                NESChess::settings.difficulty = max(1, NESChess::settings.difficulty - 1);
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
+            if(Joypad1::released.right) {
+                NESChess::settings.difficulty = min(5, NESChess::settings.difficulty + 1);
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
             break;
         default:
         case CursorPosition::PLAY:
@@ -116,10 +137,17 @@ auto TitleScreen::running() noexcept -> void {
             right_cursor_sprite.x = 104;
             right_cursor_sprite.y = 208;
             right_cursor_sprite.palette = 3;
-            if(Joypad1::released.up) cursor_position = CursorPosition::DIFFICULTY;
+            if(Joypad1::released.up) {
+                cursor_position = CursorPosition::DIFFICULTY;
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_SIXTEENTH, 8);
+            }
             if(Joypad1::released.a || Joypad1::released.start)  {
                 screen_fader.reset_frame(Ppu::get_frame_count());
                 state = State::FADE_OUT;
+                Apu::pulse_1.queue_note(Pitch::A4, Length::_180_BPM_QUARTER, 8);
+                Apu::pulse_1.queue_note(Pitch::C4, Length::_180_BPM_QUARTER, 8);
+                Apu::pulse_1.queue_note(Pitch::E4, Length::_180_BPM_QUARTER, 8);
+                Apu::pulse_1.queue_note(Pitch::A5, Length::_180_BPM_QUARTER, 8);
                 Ppu::wait();
             }
             break;

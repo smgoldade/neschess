@@ -353,15 +353,6 @@ namespace nespp {
         }
 
         /**
-         * Background update that performs all the currently buffered actions
-         * for the PPU, including data transfer and update to the control and mask registers.
-         *
-         * This will always be called during the vertical blank NMI, but can be manually called earlier to force
-         * an immediate change.
-         */
-        auto static background_update() -> void;
-        
-        /**
          * Clears the sprites from the screen by moving all of them off screen.
          */
         auto static constexpr clear_sprites() noexcept -> void {
@@ -374,6 +365,15 @@ namespace nespp {
     private:
         friend void ::__nmi_update();
         static volatile u8 frame_count;
+
+        /**
+         * Background update that performs all the currently buffered actions
+         * for the PPU, including data transfer and update to the control and mask registers.
+         *
+         * This will always be called during the vertical blank NMI, but can be manually called earlier to force
+         * an immediate change.
+         */
+        auto static background_update() -> void;
         
         struct Initializer {
             Initializer();

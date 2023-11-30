@@ -9,15 +9,12 @@
 #include "types.h"
 
 namespace nespp {
-    auto static constexpr ILLEGAL_VECTOR_ACCESS = "Illegal vector access";
-    static constexpr u16 ILLEGAL_VECTOR_ACCESS_SIZE = 21;
-
     template <class T, size_t CAPACITY>
     class Vector {
     public:
         using data_type = T;
         using size_type = size_t;
-        using iterator = const T*;
+        using iterator = T*;
         using const_iterator = const T*;
 
         constexpr Vector() noexcept : internal_size(0), data(){};
@@ -34,22 +31,22 @@ namespace nespp {
 
         [[nodiscard]] auto constexpr at(const size_type index) const noexcept -> const T& {
             if(index >= internal_size)
-                Error::fatal_error(ILLEGAL_VECTOR_ACCESS, ILLEGAL_VECTOR_ACCESS_SIZE);
+                Error::fatal_error("Vector access outside bounds", 28);
             return data[index];
         }
 
         auto constexpr at(const size_type index) noexcept -> T& {
             if(index >= internal_size)
-                Error::fatal_error(ILLEGAL_VECTOR_ACCESS, ILLEGAL_VECTOR_ACCESS_SIZE);
+                Error::fatal_error("Vector access outside bounds", 28);
             return data[index];
         }
 
         auto constexpr operator[](const size_type index) const noexcept -> const T& {
-            return at(index);
+            return data[index];
         }
 
         auto constexpr operator[](const size_type index) noexcept -> T& {
-            return at(index);
+            return data[index];
         }
 
         auto constexpr push_back(const T& value) noexcept -> void {
@@ -73,7 +70,7 @@ namespace nespp {
             ++internal_size;
         }
 
-        [[nodiscard]] auto constexpr index_of(const T& value) const noexcept -> size_t {
+        [[nodiscard]] auto constexpr index_of(const T& value) const noexcept -> size_type {
             for(size_type i = 0; i < internal_size; ++i)
                 if(data[i] == value) return i;
             return CAPACITY;
@@ -96,7 +93,7 @@ namespace nespp {
         }
 
         [[nodiscard]] auto constexpr contains(const T& value) const noexcept -> bool {
-            return index_of(value) != CAPACITY;
+            return container_contains(*this, value);
         }
 
         [[nodiscard]] auto constexpr empty() const noexcept -> bool {

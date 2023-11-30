@@ -36,11 +36,11 @@ namespace chess {
         }
 
         [[nodiscard]] auto constexpr from_square() const noexcept -> Square {
-            return {static_cast<u8>(value & FROM_SQUARE_MASK), false};
+            return Square {static_cast<u8>(value & FROM_SQUARE_MASK), false};
         }
 
         [[nodiscard]] auto constexpr to_square() const noexcept -> Square {
-            return {static_cast<u8>((value & TO_SQUARE_MASK) >> 6), false};
+            return Square {static_cast<u8>((value & TO_SQUARE_MASK) >> 6), false};
         }
 
         [[nodiscard]] auto constexpr flags() const noexcept -> MoveFlag {

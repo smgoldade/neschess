@@ -6,16 +6,7 @@
 #include "low_level.h"
 #include "types.h"
 
-// Expose joypad names for assembly routines
-extern "C" u8 joypad_1_raw;
-extern "C" u8 joypad_2_raw;
-extern "C" u8 joypad_1_pressed;
-extern "C" u8 joypad_2_pressed;
-extern "C" u8 joypad_1_held;
-extern "C" u8 joypad_2_held;
-extern "C" u8 joypad_1_released;
-extern "C" u8 joypad_2_released;
-extern "C" LEAF void __poll_joypad(); // NOLINT(*-reserved-identifier)
+extern "C" LEAF INTERRUPT_NO_RECURSE void __poll_joypad(); // NOLINT(*-reserved-identifier)
 
 namespace nespp {
     struct Joypad_Buttons {

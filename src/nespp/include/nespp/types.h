@@ -17,7 +17,7 @@ using u64 = uint64_t;
 using s64 = int64_t;
 
 template <class TO, class FROM>
-constexpr TO bit_cast(const FROM& from) {
+auto constexpr bit_cast(const FROM& from) {
     return __builtin_bit_cast(TO, from);
 }
 
@@ -32,7 +32,9 @@ concept Iterable = requires(T t) {
 };
 
 template<class T>
-concept IsConst = std::is_const_v<T>;
-
-template<class T>
 concept Pointer = std::is_pointer_v<T>;
+
+template<class T, class DATA_TYPE>
+concept BooleanPredicate = requires(T t, DATA_TYPE d) {
+    {t.operator()(d)} -> Convertible<bool>;
+};

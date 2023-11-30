@@ -16,19 +16,24 @@ namespace nespp {
         {t.capacity()} -> Convertible<size_t>;
     };
 
-    template <Container C, class LAMBDA>
-    auto constexpr container_any(C container, LAMBDA && lambda) {
+    template <Container C, BooleanPredicate<typename C::data_type> PREDICATE>
+    auto constexpr container_any(C container, PREDICATE&& lambda) {
         for(auto & value : container) {
             if(lambda(value)) return true;
         }
         return false;
     }
-    template <Container C, class LAMBDA>
-    auto constexpr container_all(C container, LAMBDA && lambda) {
+
+    template <Container C, BooleanPredicate<typename C::data_type> PREDICATE>
+    auto constexpr container_all(C container, PREDICATE&& lambda) {
         for(auto & value : container) {
             if(!lambda(value)) return false;
         }
         return true;
     }
 
+    template <Container C>
+    auto constexpr container_contains(C container, const typename C::data_type& value) {
+        return container_any(container, [&](const typename C::data_type& datum) {return datum == value;});
+    }
 }

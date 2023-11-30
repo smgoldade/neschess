@@ -1,4 +1,5 @@
 target_sources(nespp PUBLIC
+        apu.cpp
         joypad.cpp
         joypad.s
         nmi.cpp
